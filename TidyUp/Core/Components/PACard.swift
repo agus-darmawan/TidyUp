@@ -87,7 +87,7 @@ struct PAEmptyState: View {
             }
         }
         .padding(AppTheme.Spacing.xxl)
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

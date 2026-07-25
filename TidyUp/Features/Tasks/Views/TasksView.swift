@@ -69,6 +69,7 @@ struct TasksView: View {
             }
         }
         .padding(.top, AppTheme.Spacing.sm)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .searchable(text: $viewModel.searchText, prompt: "Search tasks or tags")
     }
 }
