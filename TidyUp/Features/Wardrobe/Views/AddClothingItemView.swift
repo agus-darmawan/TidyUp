@@ -39,9 +39,11 @@ struct AddClothingItemView: View {
                 }
 
                 if category.isLinen {
-                    Section("Replacement Cycle") {
+                    Section {
                         TextField("Replace every (days)", text: $replacementIntervalText)
                             .keyboardType(.numberPad)
+                    } header: {
+                        Text("Replacement Cycle")
                     } footer: {
                         Text("You'll get a reminder once this item passes its replacement cycle — e.g. 180 days for a towel.")
                     }
