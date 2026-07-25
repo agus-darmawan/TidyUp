@@ -31,12 +31,15 @@ extension Color {
 }
 
 extension UIColor {
-    /// Rough perceived-luminance check used to decide readable text color
-    /// for any solid background (badges, tags, priority pills, etc).
-    var isLight: Bool {
+    /// WCAG-style relative luminance (gamma-corrected), used to pick
+    /// whichever of white/dark text has better contrast against this color —
+    /// a proper contrast-ratio check instead of a guessed brightness cutoff.
+    var relativeLuminance: CGFloat {
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
         getRed(&r, green: &g, blue: &b, alpha: &a)
-        let luminance = 0.299 * r + 0.587 * g + 0.114 * b
-        return luminance > 0.6
+        func linearize(_ c: CGFloat) -> CGFloat {
+            c <= 0.03928 ? c / 12.92 : pow((c + 0.055) / 1.055, 2.4)
+        }
+        return 0.2126 * linearize(r) + 0.7152 * linearize(g) + 0.0722 * linearize(b)
     }
 }

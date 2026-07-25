@@ -9,6 +9,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 enum AppTheme {
 
@@ -64,11 +65,16 @@ enum AppTheme {
             }
         }
 
-        /// Returns readable text color (near-black or white) for any solid
-        /// background color, so tag/priority/status badges stay legible
-        /// no matter how light or saturated the color is.
+        /// Returns whichever of white or dark navy has the higher WCAG
+        /// contrast ratio against the given background color, so tag/
+        /// priority/status badges stay legible no matter how light,
+        /// dark, or saturated the color is.
         static func contrastingText(on color: Color) -> Color {
-            UIColor(color).isLight ? brandNavy : .white
+            let bgLuminance = UIColor(color).relativeLuminance
+            let whiteContrast = (1.0 + 0.05) / (bgLuminance + 0.05)
+            let navyLuminance = UIColor(brandNavy).relativeLuminance
+            let navyContrast = (bgLuminance + 0.05) / (navyLuminance + 0.05)
+            return whiteContrast >= navyContrast ? .white : brandNavy
         }
     }
 
