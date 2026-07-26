@@ -57,10 +57,10 @@ struct DashboardView: View {
 
     private var header: some View {
         HStack(spacing: AppTheme.Spacing.md) {
-            MascotAvatarView()
+            MascotAvatarView(size: 52)
             VStack(alignment: .leading, spacing: 2) {
                 Text("TidyUp")
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundStyle(AppTheme.Colors.primaryText)
                 Text("Your day, tidied up.")
                     .font(.system(size: 13))
@@ -69,13 +69,14 @@ struct DashboardView: View {
             Spacer()
             Button {} label: {
                 Image(systemName: "bell.fill")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(AppTheme.Colors.primaryText)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(AppTheme.Colors.accent)
                     .frame(width: 40, height: 40)
-                    .background(AppTheme.Colors.surface)
+                    .background(AppTheme.Colors.accent.opacity(0.12))
                     .clipShape(Circle())
             }
         }
+        .padding(.bottom, AppTheme.Spacing.xs)
     }
 
     private func overviewSection(_ viewModel: DashboardViewModel) -> some View {
@@ -139,10 +140,15 @@ struct DashboardView: View {
     }
 
     private func sectionLabel(_ text: String) -> some View {
-        Text(text.uppercased())
-            .font(.system(size: 12, weight: .semibold))
-            .tracking(0.6)
-            .foregroundStyle(AppTheme.Colors.secondaryText)
+        HStack(spacing: 6) {
+            RoundedRectangle(cornerRadius: 2)
+                .fill(AppTheme.Colors.accent)
+                .frame(width: 3, height: 14)
+            Text(text.uppercased())
+                .font(.system(size: 12, weight: .semibold))
+                .tracking(0.6)
+                .foregroundStyle(AppTheme.Colors.secondaryText)
+        }
     }
 }
 

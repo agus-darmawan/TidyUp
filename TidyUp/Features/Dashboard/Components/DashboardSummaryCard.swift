@@ -33,10 +33,13 @@ struct DashboardSummaryCard: View {
     var tint: DashboardCardTint = .neutral
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
             Image(systemName: icon)
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(tint.foreground.opacity(0.75))
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(tint.foreground)
+                .frame(width: 28, height: 28)
+                .background(tint.foreground.opacity(0.12))
+                .clipShape(Circle())
 
             Spacer(minLength: 0)
 
@@ -47,13 +50,13 @@ struct DashboardSummaryCard: View {
                 .lineLimit(1)
 
             Text(value)
-                .font(.system(size: 15, weight: .bold, design: .rounded))
+                .font(.system(size: 16, weight: .bold, design: .rounded))
                 .foregroundStyle(tint.foreground)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
         }
         .padding(AppTheme.Spacing.md)
-        .frame(maxWidth: .infinity, minHeight: 88, alignment: .leading)
+        .frame(maxWidth: .infinity, minHeight: 100, alignment: .leading)
         .background(tint.background)
         .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.lg, style: .continuous))
     }
