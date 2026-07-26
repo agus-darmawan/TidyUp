@@ -10,21 +10,28 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var selectedTab = 0
+
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             DashboardView()
                 .tabItem { Label("Home", systemImage: "house.fill") }
+                .tag(0)
 
             TasksView()
                 .tabItem { Label("Tasks", systemImage: "checkmark.circle.fill") }
+                .tag(1)
 
             FinanceView()
                 .tabItem { Label("Money", systemImage: "creditcard.fill") }
+                .tag(2)
 
             MoreView()
                 .tabItem { Label("More", systemImage: "ellipsis.circle.fill") }
+                .tag(3)
         }
         .tint(AppTheme.Colors.accent)
+        .animation(AppTheme.Motion.snappy, value: selectedTab)
     }
 }
 
