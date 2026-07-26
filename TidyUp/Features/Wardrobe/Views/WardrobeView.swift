@@ -31,6 +31,7 @@ struct WardrobeView: View {
                 }
             }
             .navigationTitle("Wardrobe")
+            .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
@@ -68,6 +69,9 @@ struct WardrobeView: View {
     private func content(_ viewModel: WardrobeViewModel) -> some View {
         @Bindable var viewModel = viewModel
         VStack(spacing: AppTheme.Spacing.sm) {
+            statStrip(viewModel)
+                .padding(.horizontal)
+
             CategoryFilterBar(selected: $viewModel.selectedCategory)
                 .padding(.horizontal)
 
@@ -150,6 +154,31 @@ struct WardrobeView: View {
         .tint(AppTheme.Colors.accent)
         .padding(.horizontal)
         .padding(.bottom, AppTheme.Spacing.sm)
+    }
+
+    private func statStrip(_ viewModel: WardrobeViewModel) -> some View {
+        HStack(spacing: AppTheme.Spacing.sm) {
+            wardrobeStat(title: "Total", value: "\(viewModel.items.count)", color: AppTheme.Colors.primaryText)
+            wardrobeStat(title: "Clean", value: "\(viewModel.items.filter { $0.laundryStatus == .clean }.count)", color: AppTheme.Colors.success)
+            wardrobeStat(title: "Dirty", value: "\(viewModel.items.filter { $0.laundryStatus == .dirty }.count)", color: AppTheme.Colors.danger)
+        }
+    }
+
+    private func wardrobeStat(title: String, value: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title.uppercased())
+                .font(.system(size: 9, weight: .semibold))
+                .tracking(0.3)
+                .foregroundStyle(AppTheme.Colors.secondaryText)
+            Text(value)
+                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .foregroundStyle(color)
+                .contentTransition(.numericText())
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(AppTheme.Spacing.sm)
+        .background(AppTheme.Colors.surface)
+        .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
     }
 
     private func washSoonBanner(_ count: Int) -> some View {
