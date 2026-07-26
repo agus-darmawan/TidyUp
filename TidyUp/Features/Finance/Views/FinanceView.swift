@@ -133,9 +133,9 @@ struct FinanceView: View {
 
     private func statsStrip(_ viewModel: FinanceViewModel) -> some View {
         HStack(spacing: AppTheme.Spacing.sm) {
-            statPill(title: "Net Worth", amount: viewModel.netWorth, color: AppTheme.Colors.primaryText)
-            statPill(title: "Income", amount: viewModel.monthlyIncome, color: AppTheme.Colors.income)
-            statPill(title: "Spend", amount: viewModel.monthlySpending, color: AppTheme.Colors.expense)
+            statPill(title: "Net Worth", amount: viewModel.netWorth, color: AppTheme.Colors.accent, icon: "chart.pie.fill")
+            statPill(title: "Income", amount: viewModel.monthlyIncome, color: AppTheme.Colors.income, icon: "arrow.down.circle.fill")
+            statPill(title: "Spend", amount: viewModel.monthlySpending, color: AppTheme.Colors.expense, icon: "arrow.up.circle.fill")
         }
         .padding(.horizontal)
         .overlay(alignment: .bottom) {
@@ -158,18 +158,26 @@ struct FinanceView: View {
         .padding(.bottom, viewModel.pendingReimburseTotal > 0 ? 44 : 0)
     }
 
-    private func statPill(title: String, amount: Decimal, color: Color) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title.uppercased())
-                .font(.system(size: 9, weight: .semibold))
-                .tracking(0.3)
-                .foregroundStyle(AppTheme.Colors.secondaryText)
-            Text(CurrencyFormatter.format(amount))
-                .font(.system(size: 14, weight: .bold, design: .rounded))
+    private func statPill(title: String, amount: Decimal, color: Color, icon: String) -> some View {
+        HStack(spacing: AppTheme.Spacing.xs) {
+            Image(systemName: icon)
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(color)
-                .contentTransition(.numericText())
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
+                .frame(width: 28, height: 28)
+                .background(color.opacity(0.12))
+                .clipShape(Circle())
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title.uppercased())
+                    .font(.system(size: 9, weight: .semibold))
+                    .tracking(0.3)
+                    .foregroundStyle(AppTheme.Colors.secondaryText)
+                Text(CurrencyFormatter.format(amount))
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .foregroundStyle(color)
+                    .contentTransition(.numericText())
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(AppTheme.Spacing.sm)
