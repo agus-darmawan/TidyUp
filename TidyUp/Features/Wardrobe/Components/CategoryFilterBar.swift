@@ -7,12 +7,13 @@ import SwiftUI
 
 struct CategoryFilterBar: View {
     @Binding var selected: ClothingCategory?
+    let availableCategories: [ClothingCategory]
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: AppTheme.Spacing.sm) {
                 chip(title: "All", isSelected: selected == nil) { selected = nil }
-                ForEach(ClothingCategory.allCases) { category in
+                ForEach(availableCategories) { category in
                     chip(title: category.label, isSelected: selected == category) { selected = category }
                 }
             }

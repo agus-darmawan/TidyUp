@@ -91,7 +91,7 @@ struct WardrobeView: View {
 
             HStack(spacing: AppTheme.Spacing.sm) {
                 if grouping != .category {
-                    CategoryFilterBar(selected: $viewModel.selectedCategory)
+                    CategoryFilterBar(selected: $viewModel.selectedCategory, availableCategories: viewModel.categoriesInUse)
                 }
                 Spacer(minLength: 0)
                 Button {

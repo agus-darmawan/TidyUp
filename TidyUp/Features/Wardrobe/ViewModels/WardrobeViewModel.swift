@@ -31,6 +31,14 @@ final class WardrobeViewModel {
         return items.filter { $0.category == selectedCategory }
     }
 
+    /// Only categories that actually contain at least one item — no
+    /// point showing a clickable "Prayer" chip if you own zero prayer clothes.
+    var categoriesInUse: [ClothingCategory] {
+        ClothingCategory.allCases.filter { category in
+            items.contains { $0.category == category }
+        }
+    }
+
     /// Items grouped by category — each group only appears if it has items.
     var groupedByCategory: [(category: ClothingCategory, items: [ClothingItem])] {
         ClothingCategory.allCases.compactMap { category in
