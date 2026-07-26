@@ -62,6 +62,7 @@ enum AppTheme {
             switch status {
             case .clean: return brandGreen
             case .dirty: return brandCoral
+            case .washing: return brandMint
             }
         }
 

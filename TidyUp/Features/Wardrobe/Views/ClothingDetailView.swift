@@ -74,8 +74,15 @@ struct ClothingDetailView: View {
                 if let lastWashed = item.lastWashedDate { LabeledContent("Last Washed", value: lastWashed.formatted(.medium)) }
                 LabeledContent("Worn Since Wash", value: "\(item.wearCountSinceWash)x")
 
+                if item.laundryStatus == .washing {
+                    LabeledContent("Estimated Done", value: item.washTimeRemainingLabel)
+                }
+
                 if item.laundryStatus == .dirty {
-                    Button("Mark as Washed") { viewModel?.markWashed(item) }
+                    Button("Start Wash") { viewModel?.startWash(item) }
+                }
+                if item.laundryStatus == .washing {
+                    Button("Mark as Done") { viewModel?.markWashed(item) }
                 }
             }
 

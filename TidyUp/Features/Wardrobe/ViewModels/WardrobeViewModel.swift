@@ -71,6 +71,24 @@ final class WardrobeViewModel {
         load()
     }
 
+    /// Dirty -> In Laundry, with an estimated completion time.
+    func startWash(_ item: ClothingItem) {
+        item.startWash()
+        repository.save(item)
+        load()
+    }
+
+    var washingItemsCount: Int {
+        items.filter { $0.laundryStatus == .washing }.count
+    }
+
+    /// Items currently in the laundry, soonest-ready first — used for the
+    /// "In Laundry" list.
+    var itemsInLaundry: [ClothingItem] {
+        items.filter { $0.laundryStatus == .washing }
+            .sorted { ($0.estimatedWashDoneDate ?? .distantFuture) < ($1.estimatedWashDoneDate ?? .distantFuture) }
+    }
+
     func delete(_ item: ClothingItem) {
         if let filename = item.photoFilename {
             imageStorageService.deleteImage(filename: filename)

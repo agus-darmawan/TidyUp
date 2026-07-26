@@ -4,6 +4,7 @@
 //
 //  Tap the circle to add this item to "today's outfit" cart — confirm
 //  once from the bottom bar to log the wear across the whole selection.
+//  Status badge matches Task's soft-tint tag chip style for consistency.
 //
 
 import SwiftUI
@@ -13,6 +14,7 @@ struct ClothingRowView: View {
     let thumbnail: UIImage?
     let isSelected: Bool
     let onToggleSelect: () -> Void
+    let onStartWash: () -> Void
     let onWashed: () -> Void
     let onDelete: () -> Void
 
@@ -27,7 +29,7 @@ struct ClothingRowView: View {
                 Text(item.itemCode)
                     .font(.system(size: 11))
                     .foregroundStyle(AppTheme.Colors.secondaryText)
-                statusBadge
+                PATagChip(text: statusText, color: statusColor)
             }
 
             Spacer()
@@ -54,7 +56,10 @@ struct ClothingRowView: View {
                 Label("Delete", systemImage: "trash")
             }
             if item.laundryStatus == .dirty {
-                Button("Washed") { onWashed() }.tint(AppTheme.Colors.success)
+                Button("Start Wash") { onStartWash() }.tint(AppTheme.Colors.accent)
+            }
+            if item.laundryStatus == .washing {
+                Button("Done") { onWashed() }.tint(AppTheme.Colors.success)
             }
         }
     }
@@ -77,23 +82,24 @@ struct ClothingRowView: View {
         }
     }
 
-    private var statusBadge: some View {
-        let color: Color
-        let text: String
+    private var statusColor: Color {
         if let remaining = item.daysRemainingInCycle {
-            color = remaining <= 1 ? AppTheme.Colors.warning : AppTheme.Colors.success
-            text = remaining <= 0 ? "Wash now" : "\(remaining)d left"
-        } else {
-            color = item.laundryStatus == .dirty ? AppTheme.Colors.danger : AppTheme.Colors.success
-            text = item.laundryStatus.label
+            return remaining <= 1 ? AppTheme.Colors.warning : AppTheme.Colors.success
         }
+        switch item.laundryStatus {
+        case .clean: return AppTheme.Colors.success
+        case .dirty: return AppTheme.Colors.danger
+        case .washing: return AppTheme.Colors.accent
+        }
+    }
 
-        return Text(text)
-            .font(.system(size: 10, weight: .semibold))
-            .padding(.horizontal, 8)
-            .padding(.vertical, 2)
-            .background(color)
-            .foregroundStyle(AppTheme.Colors.contrastingText(on: color))
-            .clipShape(Capsule())
+    private var statusText: String {
+        if let remaining = item.daysRemainingInCycle {
+            return remaining <= 0 ? "Wash now" : "\(remaining)d left"
+        }
+        if item.laundryStatus == .washing {
+            return item.washTimeRemainingLabel
+        }
+        return item.laundryStatus.label
     }
 }

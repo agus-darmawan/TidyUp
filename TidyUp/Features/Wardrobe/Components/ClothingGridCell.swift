@@ -58,7 +58,7 @@ struct ClothingGridCell: View {
                 .font(.system(size: 10))
                 .foregroundStyle(AppTheme.Colors.secondaryText)
 
-            statusBadge
+            PATagChip(text: statusText, color: statusColor)
         }
         .padding(AppTheme.Spacing.sm)
         .background(isSelected ? AppTheme.Colors.accent.opacity(0.08) : AppTheme.Colors.surface)
@@ -69,22 +69,24 @@ struct ClothingGridCell: View {
         )
     }
 
-    private var statusBadge: some View {
-        let color: Color
-        let text: String
+    private var statusColor: Color {
         if let remaining = item.daysRemainingInCycle {
-            color = remaining <= 1 ? AppTheme.Colors.warning : AppTheme.Colors.success
-            text = remaining <= 0 ? "Wash now" : "\(remaining)d left"
-        } else {
-            color = item.laundryStatus == .dirty ? AppTheme.Colors.danger : AppTheme.Colors.success
-            text = item.laundryStatus.label
+            return remaining <= 1 ? AppTheme.Colors.warning : AppTheme.Colors.success
         }
-        return Text(text)
-            .font(.system(size: 9, weight: .semibold))
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(color)
-            .foregroundStyle(AppTheme.Colors.contrastingText(on: color))
-            .clipShape(Capsule())
+        switch item.laundryStatus {
+        case .clean: return AppTheme.Colors.success
+        case .dirty: return AppTheme.Colors.danger
+        case .washing: return AppTheme.Colors.accent
+        }
+    }
+
+    private var statusText: String {
+        if let remaining = item.daysRemainingInCycle {
+            return remaining <= 0 ? "Wash now" : "\(remaining)d left"
+        }
+        if item.laundryStatus == .washing {
+            return item.washTimeRemainingLabel
+        }
+        return item.laundryStatus.label
     }
 }

@@ -53,8 +53,14 @@ enum ClothingCategory: String, Codable, CaseIterable, Identifiable {
 }
 
 enum LaundryStatus: String, Codable {
-    case clean, dirty
-    var label: String { self == .clean ? "Clean" : "Dirty" }
+    case clean, dirty, washing
+    var label: String {
+        switch self {
+        case .clean: "Clean"
+        case .dirty: "Dirty"
+        case .washing: "In Laundry"
+        }
+    }
 }
 
 @Model
@@ -73,6 +79,7 @@ final class ClothingItem {
     var laundryStatusRaw: String
     var lastWornDate: Date?
     var lastWashedDate: Date?
+    var washStartedDate: Date?
     var wearCountSinceWash: Int
 
     /// Duration-based wear cycle (jackets/linens only). `nil` for
@@ -138,7 +145,39 @@ final class ClothingItem {
         lastWashedDate = .now
         wearCountSinceWash = 0
         wearCycleStartDate = nil
+        washStartedDate = nil
         laundryStatusRaw = LaundryStatus.clean.rawValue
+    }
+
+    /// Dirty → In Laundry: starts the wash cycle with an estimated
+    /// completion time (a typical wash-and-dry cycle, ~4 hours).
+    func startWash() {
+        washStartedDate = .now
+        laundryStatusRaw = LaundryStatus.washing.rawValue
+    }
+
+    static let defaultWashDurationHours = 4
+
+    /// Estimated time the laundry will be done, if currently washing.
+    var estimatedWashDoneDate: Date? {
+        guard laundryStatus == .washing, let started = washStartedDate else { return nil }
+        return started.addingTimeInterval(TimeInterval(Self.defaultWashDurationHours * 3600))
+    }
+
+    var isWashReady: Bool {
+        guard let doneDate = estimatedWashDoneDate else { return false }
+        return Date.now >= doneDate
+    }
+
+    /// e.g. "Ready in 2h 15m" or "Ready now" — shown on the laundry badge.
+    var washTimeRemainingLabel: String {
+        guard let doneDate = estimatedWashDoneDate else { return "" }
+        if Date.now >= doneDate { return "Ready now" }
+        let totalMinutes = max(0, Int(doneDate.timeIntervalSince(.now) / 60))
+        let hours = totalMinutes / 60
+        let minutes = totalMinutes % 60
+        if hours > 0 { return "Ready in \(hours)h\(minutes > 0 ? " \(minutes)m" : "")" }
+        return "Ready in \(minutes)m"
     }
 
     /// Days remaining before a duration-cycle item (jacket/linen) needs washing.

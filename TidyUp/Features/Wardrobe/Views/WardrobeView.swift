@@ -4,6 +4,7 @@
 //
 //  Grid view by default (toggle to list anytime). Main feature is
 //  logging wear time via the outfit cart — tap items in, confirm once.
+//  Gradient hero header matches Home/Money's visual language.
 //
 
 import SwiftUI
@@ -30,13 +31,8 @@ struct WardrobeView: View {
                     ProgressView()
                 }
             }
-            .navigationTitle("Wardrobe")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button { showingAdd = true } label: { Image(systemName: "plus.circle.fill") }
-                }
-            }
+            .toolbar(.hidden, for: .navigationBar)
+            .ignoresSafeArea(edges: .top)
             .sheet(isPresented: $showingAdd) {
                 if let viewModel {
                     AddClothingItemView(suggestedCode: viewModel.nextItemCode()) { newItem in
@@ -62,6 +58,8 @@ struct WardrobeView: View {
     private func content(_ viewModel: WardrobeViewModel) -> some View {
         @Bindable var viewModel = viewModel
         VStack(spacing: AppTheme.Spacing.sm) {
+            heroHeader(viewModel)
+
             statStrip(viewModel)
                 .padding(.horizontal)
 
@@ -79,6 +77,11 @@ struct WardrobeView: View {
                 }
             }
             .padding(.horizontal)
+
+            if !viewModel.itemsInLaundry.isEmpty {
+                laundrySection(viewModel)
+                    .padding(.horizontal)
+            }
 
             if !viewModel.itemsNeedingWash.isEmpty {
                 washSoonBanner(viewModel.itemsNeedingWash.count)
@@ -118,6 +121,7 @@ struct WardrobeView: View {
                                             thumbnail: item.photoFilename.flatMap { viewModel.loadImage(filename: $0) },
                                             isSelected: cart.isSelected(item),
                                             onToggleSelect: { cart.toggle(item) },
+                                            onStartWash: { viewModel.startWash(item) },
                                             onWashed: { viewModel.markWashed(item) },
                                             onDelete: { viewModel.delete(item) }
                                         )
@@ -132,7 +136,6 @@ struct WardrobeView: View {
                 }
             }
         }
-        .padding(.top, AppTheme.Spacing.sm)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .overlay(alignment: .bottom) {
             if !cart.isEmpty {
@@ -140,6 +143,34 @@ struct WardrobeView: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+    }
+
+    private func heroHeader(_ viewModel: WardrobeViewModel) -> some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Wardrobe")
+                    .font(AppTheme.Typography.title1)
+                    .foregroundStyle(.white)
+                Text("\(viewModel.items.count) items in your closet")
+                    .font(AppTheme.Typography.footnote)
+                    .foregroundStyle(.white.opacity(0.75))
+            }
+            Spacer()
+            Button { showingAdd = true } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 40, height: 40)
+                    .background(.white.opacity(0.18))
+                    .clipShape(Circle())
+            }
+        }
+        .padding(.horizontal, AppTheme.Spacing.lg)
+        .padding(.top, 56)
+        .padding(.bottom, AppTheme.Spacing.lg)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppTheme.Colors.walletGradient(for: 2))
+        .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: AppTheme.Radius.xl, bottomTrailingRadius: AppTheme.Radius.xl))
     }
 
     private func confirmBar(_ viewModel: WardrobeViewModel) -> some View {
@@ -165,6 +196,7 @@ struct WardrobeView: View {
         HStack(spacing: AppTheme.Spacing.sm) {
             wardrobeStat(title: "Total", value: "\(viewModel.items.count)", color: AppTheme.Colors.primaryText)
             wardrobeStat(title: "Clean", value: "\(viewModel.items.filter { $0.laundryStatus == .clean }.count)", color: AppTheme.Colors.success)
+            wardrobeStat(title: "Washing", value: "\(viewModel.washingItemsCount)", color: AppTheme.Colors.accent)
             wardrobeStat(title: "Dirty", value: "\(viewModel.items.filter { $0.laundryStatus == .dirty }.count)", color: AppTheme.Colors.danger)
         }
     }
@@ -176,14 +208,45 @@ struct WardrobeView: View {
                 .tracking(0.3)
                 .foregroundStyle(AppTheme.Colors.secondaryText)
             Text(value)
-                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .font(.system(size: 15, weight: .bold, design: .rounded))
                 .foregroundStyle(color)
                 .contentTransition(.numericText())
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(AppTheme.Spacing.sm)
         .background(AppTheme.Colors.surface)
         .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
+    }
+
+    private func laundrySection(_ viewModel: WardrobeViewModel) -> some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+            Text("IN LAUNDRY")
+                .font(.system(size: 11, weight: .semibold))
+                .tracking(0.4)
+                .foregroundStyle(AppTheme.Colors.secondaryText)
+
+            VStack(spacing: AppTheme.Spacing.xs) {
+                ForEach(viewModel.itemsInLaundry) { item in
+                    HStack {
+                        Image(systemName: "washer.fill")
+                            .font(.system(size: 13))
+                            .foregroundStyle(AppTheme.Colors.accent)
+                        Text(item.name)
+                            .font(.system(size: 13, weight: .medium))
+                        Spacer()
+                        Text(item.washTimeRemainingLabel)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(AppTheme.Colors.accent)
+                    }
+                    .padding(.horizontal, AppTheme.Spacing.md)
+                    .padding(.vertical, AppTheme.Spacing.sm)
+                    .background(AppTheme.Colors.accent.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
+                }
+            }
+        }
     }
 
     private func washSoonBanner(_ count: Int) -> some View {
