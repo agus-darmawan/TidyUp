@@ -1,0 +1,29 @@
+name: iOS Build & Test
+
+# Runs on every push/PR. Requires the TidyUp.xcodeproj (created locally
+# in Xcode) to be committed to the repo, with a "TidyUpTests" unit test
+# target added — see README.md "Running Tests" for the one-time setup.
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        run: sudo xcode-select -switch /Applications/Xcode_16.app/Contents/Developer
+
+      - name: Build and test
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project TidyUp.xcodeproj \
+            -scheme TidyUp \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest'
