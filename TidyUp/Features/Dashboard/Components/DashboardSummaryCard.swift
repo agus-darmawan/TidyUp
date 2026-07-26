@@ -58,5 +58,6 @@ struct DashboardSummaryCard: View {
         .frame(maxWidth: .infinity, minHeight: 100, alignment: .leading)
         .background(AppTheme.Colors.surface)
         .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.lg, style: .continuous))
+        .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 3)
     }
 }
