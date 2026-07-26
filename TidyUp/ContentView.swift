@@ -44,12 +44,20 @@ struct MoreView: View {
         NavigationStack {
             List {
                 Section {
-                    NavigationLink { WardrobeView() } label: { Label("Wardrobe", systemImage: "tshirt.fill") }
-                    NavigationLink { JournalView() } label: { Label("Journal", systemImage: "book.closed.fill") }
-                    NavigationLink { CalendarView() } label: { Label("Calendar", systemImage: "calendar") }
+                    NavigationLink { WardrobeView() } label: {
+                        SettingsIconRow(icon: "tshirt.fill", tint: AppTheme.Colors.warning, title: "Wardrobe")
+                    }
+                    NavigationLink { JournalView() } label: {
+                        SettingsIconRow(icon: "book.closed.fill", tint: AppTheme.Colors.reimburse, title: "Journal")
+                    }
+                    NavigationLink { CalendarView() } label: {
+                        SettingsIconRow(icon: "calendar", tint: AppTheme.Colors.brandGreen, title: "Calendar")
+                    }
                 }
                 Section {
-                    NavigationLink { SettingsView() } label: { Label("Settings", systemImage: "gearshape.fill") }
+                    NavigationLink { SettingsView() } label: {
+                        SettingsIconRow(icon: "gearshape.fill", tint: AppTheme.Colors.brandGray, title: "Settings")
+                    }
                 }
             }
             .navigationTitle("More")
