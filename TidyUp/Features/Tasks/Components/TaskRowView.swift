@@ -11,10 +11,13 @@ struct TaskRowView: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: AppTheme.Spacing.md) {
-            Button(action: onToggle) {
+            Button {
+                withAnimation(AppTheme.Motion.bouncy) { onToggle() }
+            } label: {
                 Image(systemName: task.isDone ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 20))
+                    .font(.system(size: 22))
                     .foregroundStyle(task.isDone ? AppTheme.Colors.brandMint : AppTheme.Colors.brandGray)
+                    .symbolEffect(.bounce, value: task.isDone)
             }
             .buttonStyle(.plain)
 
@@ -62,5 +65,7 @@ struct TaskRowView: View {
         .padding(AppTheme.Spacing.md)
         .background(AppTheme.Colors.surface)
         .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
+        .shadow(color: Color.black.opacity(0.03), radius: 6, x: 0, y: 2)
+        .animation(AppTheme.Motion.quick, value: task.isDone)
     }
 }

@@ -60,16 +60,19 @@ struct TasksView: View {
                             } label: {
                                 TaskRowView(task: task) { viewModel.toggleDone(task) }
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(PressableButtonStyle())
+                            .transition(.asymmetric(insertion: .scale.combined(with: .opacity), removal: .opacity))
                         }
                     }
                     .padding(.horizontal)
                     .padding(.bottom, AppTheme.Spacing.xxl)
                 }
+                .animation(AppTheme.Motion.snappy, value: viewModel.filteredTasks.map(\.id))
             }
         }
         .padding(.top, AppTheme.Spacing.sm)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .animation(AppTheme.Motion.quick, value: viewModel.filter)
     }
 }
 
