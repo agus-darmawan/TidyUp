@@ -13,6 +13,7 @@ final class CalendarViewModel {
     private let scheduleEventRepository: ScheduleEventRepositoryProtocol
 
     var selectedDate: Date = .now
+    var monthAnchor: Date = .now
     private var allEvents: [CalendarEvent] = []
 
     init(
@@ -41,6 +42,26 @@ final class CalendarViewModel {
 
     func events(on date: Date) -> [CalendarEvent] {
         allEvents.filter { $0.date.isSameDay(as: date) }.sorted { $0.date < $1.date }
+    }
+
+    var daysGrid: [Date?] {
+        Date.daysGrid(for: monthAnchor)
+    }
+
+    func hasEvents(on date: Date) -> Bool {
+        !events(on: date).isEmpty
+    }
+
+    func goToPreviousMonth() {
+        monthAnchor = monthAnchor.adding(months: -1)
+    }
+
+    func goToNextMonth() {
+        monthAnchor = monthAnchor.adding(months: 1)
+    }
+
+    func selectDate(_ date: Date) {
+        selectedDate = date
     }
 
     var selectedDayEvents: [CalendarEvent] {

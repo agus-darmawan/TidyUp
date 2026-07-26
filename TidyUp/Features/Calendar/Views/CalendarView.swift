@@ -2,10 +2,9 @@
 //  CalendarView.swift
 //  TidyUp
 //
-//  Now actually functions like a real calendar: navigable week strip,
-//  a selected-day schedule with start/end times and duration, and a
-//  "+" button to add events directly here (Tasks with due dates still
-//  show up too, whichever place you add them from).
+//  A real calendar: month grid you can page through, tap any day to see
+//  its agenda below (with times/duration). This is deliberately a
+//  different, fuller layout than the small week-strip widget on Home.
 //
 
 import SwiftUI
@@ -14,6 +13,9 @@ struct CalendarView: View {
     @Environment(DependencyContainer.self) private var container
     @State private var viewModel: CalendarViewModel?
     @State private var showingAddEvent = false
+
+    private let weekdaySymbols = ["M", "T", "W", "T", "F", "S", "S"]
+    private let columns = Array(repeating: GridItem(.flexible()), count: 7)
 
     var body: some View {
         Group {
@@ -49,20 +51,16 @@ struct CalendarView: View {
 
     @ViewBuilder
     private func content(_ viewModel: CalendarViewModel) -> some View {
-        @Bindable var viewModel = viewModel
         ScrollView {
             VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
-                CalendarWeekStrip(
-                    selected: $viewModel.selectedDate,
-                    eventDates: Set(viewModel.upcomingEvents.map(\.date))
-                )
-                .padding()
-                .background(AppTheme.Colors.surface)
-                .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.lg, style: .continuous))
-                .padding(.horizontal)
+                monthGrid(viewModel)
+                    .padding()
+                    .background(AppTheme.Colors.surface)
+                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.lg, style: .continuous))
+                    .padding(.horizontal)
 
                 VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-                    Text(viewModel.selectedDate.isToday ? "Today's Schedule" : viewModel.selectedDate.formatted(.medium))
+                    Text(viewModel.selectedDate.isToday ? "Today" : viewModel.selectedDate.formatted(.medium))
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(AppTheme.Colors.secondaryText)
                         .padding(.horizontal)
@@ -81,25 +79,45 @@ struct CalendarView: View {
                         .padding(.horizontal)
                     }
                 }
-
-                if !viewModel.upcomingEvents.isEmpty {
-                    VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-                        Text("Next Up")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(AppTheme.Colors.secondaryText)
-                            .padding(.horizontal)
-
-                        VStack(spacing: AppTheme.Spacing.sm) {
-                            ForEach(viewModel.upcomingEvents.filter { !$0.date.isSameDay(as: viewModel.selectedDate) }.prefix(8)) { event in
-                                eventRow(event, viewModel: viewModel)
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-                }
             }
             .padding(.vertical)
             .padding(.bottom, AppTheme.Spacing.xxl)
+        }
+    }
+
+    private func monthGrid(_ viewModel: CalendarViewModel) -> some View {
+        VStack(spacing: AppTheme.Spacing.md) {
+            HStack {
+                Button { viewModel.goToPreviousMonth() } label: { Image(systemName: "chevron.left") }
+                Spacer()
+                Text(viewModel.monthAnchor.formatted(.monthYear))
+                    .font(.system(size: 16, weight: .semibold))
+                Spacer()
+                Button { viewModel.goToNextMonth() } label: { Image(systemName: "chevron.right") }
+            }
+            .foregroundStyle(AppTheme.Colors.primaryText)
+
+            HStack {
+                ForEach(weekdaySymbols.indices, id: \.self) { index in
+                    Text(weekdaySymbols[index])
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(AppTheme.Colors.secondaryText)
+                        .frame(maxWidth: .infinity)
+                }
+            }
+
+            LazyVGrid(columns: columns, spacing: 6) {
+                ForEach(viewModel.daysGrid.indices, id: \.self) { index in
+                    let date = viewModel.daysGrid[index]
+                    CalendarMonthGridCell(
+                        date: date,
+                        isSelected: date.map { viewModel.selectedDate.isSameDay(as: $0) } ?? false,
+                        hasEvents: date.map(viewModel.hasEvents(on:)) ?? false
+                    ) {
+                        if let date { viewModel.selectDate(date) }
+                    }
+                }
+            }
         }
     }
 
