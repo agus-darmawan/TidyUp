@@ -2,43 +2,59 @@
 //  ClothingDetailView.swift
 //  TidyUp
 //
+//  One photo per item, tap to replace it. Includes a Delete Item action.
+//
 
 import SwiftUI
 import PhotosUI
 
 struct ClothingDetailView: View {
     @Environment(DependencyContainer.self) private var container
+    @Environment(\.dismiss) private var dismiss
     @State private var viewModel: WardrobeViewModel?
     @State private var selectedPhoto: PhotosPickerItem?
+    @State private var showingDeleteConfirm = false
 
     let item: ClothingItem
 
     var body: some View {
         List {
             Section {
-                if !item.photoFilenames.isEmpty {
-                    ScrollView(.horizontal) {
-                        HStack {
-                            ForEach(item.photoFilenames, id: \.self) { filename in
-                                if let image = viewModel?.loadImage(filename: filename) {
-                                    Image(uiImage: image)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 140, height: 140)
-                                        .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
+                PhotosPicker(selection: $selectedPhoto, matching: .images) {
+                    ZStack(alignment: .bottomTrailing) {
+                        if let filename = item.photoFilename, let image = viewModel?.loadImage(filename: filename) {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(height: 200)
+                                .frame(maxWidth: .infinity)
+                                .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
+                                .clipped()
+                        } else {
+                            RoundedRectangle(cornerRadius: AppTheme.Radius.md)
+                                .fill(AppTheme.Colors.surfaceElevated)
+                                .frame(height: 160)
+                                .overlay {
+                                    VStack(spacing: 6) {
+                                        Image(systemName: "photo.badge.plus")
+                                            .font(.system(size: 28))
+                                        Text("Add Photo").font(.system(size: 13, weight: .medium))
+                                    }
+                                    .foregroundStyle(AppTheme.Colors.secondaryText)
                                 }
-                            }
                         }
+                        Image(systemName: "pencil.circle.fill")
+                            .font(.system(size: 24))
+                            .foregroundStyle(.white, AppTheme.Colors.accent)
+                            .padding(8)
                     }
                 }
-                PhotosPicker(selection: $selectedPhoto, matching: .images) {
-                    Label("Add Photo", systemImage: "photo.badge.plus")
-                }
+                .buttonStyle(.plain)
                 .onChange(of: selectedPhoto) { _, newValue in
                     Task {
                         if let data = try? await newValue?.loadTransferable(type: Data.self),
                            let image = UIImage(data: data) {
-                            viewModel?.addPhoto(item, image: image)
+                            viewModel?.setPhoto(item, image: image)
                         }
                     }
                 }
@@ -75,9 +91,24 @@ struct ClothingDetailView: View {
             if !item.notes.isEmpty {
                 Section("Notes") { Text(item.notes) }
             }
+
+            Section {
+                Button(role: .destructive) {
+                    showingDeleteConfirm = true
+                } label: {
+                    Label("Delete Item", systemImage: "trash")
+                }
+            }
         }
         .navigationTitle(item.name)
         .navigationBarTitleDisplayMode(.inline)
+        .confirmationDialog("Delete \(item.name)?", isPresented: $showingDeleteConfirm, titleVisibility: .visible) {
+            Button("Delete", role: .destructive) {
+                viewModel?.delete(item)
+                dismiss()
+            }
+            Button("Cancel", role: .cancel) {}
+        }
         .onAppear {
             if viewModel == nil {
                 viewModel = WardrobeViewModel(

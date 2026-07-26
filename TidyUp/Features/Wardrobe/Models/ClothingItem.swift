@@ -66,7 +66,7 @@ final class ClothingItem {
     var brand: String
     var color: String
     var notes: String
-    var photoFilenames: [String]
+    var photoFilename: String?
     var purchaseDate: Date?
     var createdAt: Date
 
@@ -88,7 +88,7 @@ final class ClothingItem {
         brand: String = "",
         color: String = "",
         notes: String = "",
-        photoFilenames: [String] = [],
+        photoFilename: String? = nil,
         purchaseDate: Date? = nil,
         usageDurationDays: Int? = nil
     ) {
@@ -99,7 +99,7 @@ final class ClothingItem {
         self.brand = brand
         self.color = color
         self.notes = notes
-        self.photoFilenames = photoFilenames
+        self.photoFilename = photoFilename
         self.purchaseDate = purchaseDate
         self.createdAt = .now
         self.laundryStatusRaw = LaundryStatus.clean.rawValue

@@ -72,7 +72,7 @@ final class WardrobeViewModel {
     }
 
     func delete(_ item: ClothingItem) {
-        for filename in item.photoFilenames {
+        if let filename = item.photoFilename {
             imageStorageService.deleteImage(filename: filename)
         }
         notificationService.cancelReminder(id: item.id)
@@ -80,9 +80,14 @@ final class WardrobeViewModel {
         load()
     }
 
-    func addPhoto(_ item: ClothingItem, image: UIImage) {
+    /// Sets (or replaces) the single photo for this item — deletes the
+    /// previous one first so old files don't pile up unused.
+    func setPhoto(_ item: ClothingItem, image: UIImage) {
+        if let oldFilename = item.photoFilename {
+            imageStorageService.deleteImage(filename: oldFilename)
+        }
         guard let filename = try? imageStorageService.saveImage(image) else { return }
-        item.photoFilenames.append(filename)
+        item.photoFilename = filename
         repository.save(item)
         load()
     }

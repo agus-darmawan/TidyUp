@@ -2,19 +2,24 @@
 //  WardrobeView.swift
 //  TidyUp
 //
-//  Main feature here is logging wear time. Tap items into "today's
-//  outfit" cart, then confirm once from the bottom bar — the classic
-//  add-to-cart-then-checkout flow, applied to getting dressed.
+//  Grid view by default (toggle to list anytime). Main feature is
+//  logging wear time via the outfit cart — tap items in, confirm once.
 //
 
 import SwiftUI
+
+private enum WardrobeLayout {
+    case grid, list
+}
 
 struct WardrobeView: View {
     @Environment(DependencyContainer.self) private var container
     @State private var viewModel: WardrobeViewModel?
     @State private var cart = OutfitCartViewModel()
     @State private var showingAdd = false
-    @State private var showingConfirmSheet = false
+    @State private var layout: WardrobeLayout = .grid
+
+    private let gridColumns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
 
     var body: some View {
         NavigationStack {
@@ -27,6 +32,13 @@ struct WardrobeView: View {
             }
             .navigationTitle("Wardrobe")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        layout = layout == .grid ? .list : .grid
+                    } label: {
+                        Image(systemName: layout == .grid ? "list.bullet" : "square.grid.2x2")
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { showingAdd = true } label: { Image(systemName: "plus.circle.fill") }
                 }
@@ -68,20 +80,42 @@ struct WardrobeView: View {
                 PAEmptyState(systemImage: "tshirt", title: "No clothing items", message: "Add items to start tracking your wardrobe.")
             } else {
                 ScrollView {
-                    LazyVStack(spacing: AppTheme.Spacing.sm) {
-                        ForEach(viewModel.filteredItems) { item in
-                            NavigationLink {
-                                ClothingDetailView(item: item)
-                            } label: {
-                                ClothingRowView(
-                                    item: item,
-                                    thumbnail: item.photoFilenames.first.flatMap { viewModel.loadImage(filename: $0) },
-                                    isSelected: cart.isSelected(item),
-                                    onToggleSelect: { cart.toggle(item) },
-                                    onWashed: { viewModel.markWashed(item) }
-                                )
+                    Group {
+                        switch layout {
+                        case .grid:
+                            LazyVGrid(columns: gridColumns, spacing: AppTheme.Spacing.md) {
+                                ForEach(viewModel.filteredItems) { item in
+                                    NavigationLink {
+                                        ClothingDetailView(item: item)
+                                    } label: {
+                                        ClothingGridCell(
+                                            item: item,
+                                            thumbnail: item.photoFilename.flatMap { viewModel.loadImage(filename: $0) },
+                                            isSelected: cart.isSelected(item),
+                                            onToggleSelect: { cart.toggle(item) }
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+                                }
                             }
-                            .buttonStyle(.plain)
+                        case .list:
+                            LazyVStack(spacing: AppTheme.Spacing.sm) {
+                                ForEach(viewModel.filteredItems) { item in
+                                    NavigationLink {
+                                        ClothingDetailView(item: item)
+                                    } label: {
+                                        ClothingRowView(
+                                            item: item,
+                                            thumbnail: item.photoFilename.flatMap { viewModel.loadImage(filename: $0) },
+                                            isSelected: cart.isSelected(item),
+                                            onToggleSelect: { cart.toggle(item) },
+                                            onWashed: { viewModel.markWashed(item) },
+                                            onDelete: { viewModel.delete(item) }
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
                         }
                     }
                     .padding(.horizontal)

@@ -14,6 +14,7 @@ struct ClothingRowView: View {
     let isSelected: Bool
     let onToggleSelect: () -> Void
     let onWashed: () -> Void
+    let onDelete: () -> Void
 
     var body: some View {
         HStack(spacing: AppTheme.Spacing.md) {
@@ -46,6 +47,9 @@ struct ClothingRowView: View {
                 .stroke(isSelected ? AppTheme.Colors.accent : .clear, lineWidth: 1.5)
         )
         .swipeActions(edge: .trailing) {
+            Button(role: .destructive, action: onDelete) {
+                Label("Delete", systemImage: "trash")
+            }
             if item.laundryStatus == .dirty {
                 Button("Washed") { onWashed() }.tint(AppTheme.Colors.success)
             }

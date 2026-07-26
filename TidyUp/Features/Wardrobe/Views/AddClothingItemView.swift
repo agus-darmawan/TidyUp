@@ -4,9 +4,11 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct AddClothingItemView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(DependencyContainer.self) private var container
 
     let suggestedCode: String
     let onSave: (ClothingItem) -> Void
@@ -19,11 +21,37 @@ struct AddClothingItemView: View {
     @State private var hasPurchaseDate = false
     @State private var purchaseDate = Date.now
     @State private var usageDurationText = "7"
+    @State private var photo: UIImage?
+    @State private var photoPickerItem: PhotosPickerItem?
 
     var body: some View {
         NavigationStack {
             Form {
                 Section {
+                    PhotosPicker(selection: $photoPickerItem, matching: .images) {
+                        HStack {
+                            if let photo {
+                                Image(uiImage: photo)
+                                    .resizable().scaledToFill()
+                                    .frame(width: 44, height: 44)
+                                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.sm))
+                            } else {
+                                Image(systemName: "photo.badge.plus")
+                                    .frame(width: 44, height: 44)
+                                    .background(AppTheme.Colors.surfaceElevated)
+                                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.sm))
+                            }
+                            Text(photo == nil ? "Add Photo" : "Change Photo")
+                        }
+                    }
+                    .onChange(of: photoPickerItem) { _, newValue in
+                        Task {
+                            if let data = try? await newValue?.loadTransferable(type: Data.self) {
+                                photo = UIImage(data: data)
+                            }
+                        }
+                    }
+
                     LabeledContent("Item Code", value: suggestedCode)
                     TextField("Name", text: $name)
                     Picker("Category", selection: $category) {
@@ -87,6 +115,9 @@ struct AddClothingItemView: View {
             purchaseDate: hasPurchaseDate ? purchaseDate : nil,
             usageDurationDays: category.usesDurationCycle ? Int(usageDurationText) : nil
         )
+        if let photo {
+            item.photoFilename = try? container.imageStorageService.saveImage(photo)
+        }
         onSave(item)
         dismiss()
     }
