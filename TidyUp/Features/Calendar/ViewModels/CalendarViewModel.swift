@@ -10,15 +10,19 @@ import Observation
 final class CalendarViewModel {
     private let taskRepository: TaskRepositoryProtocol
     private let journalRepository: JournalRepositoryProtocol
-    private let transactionRepository: TransactionRepositoryProtocol
+    private let scheduleEventRepository: ScheduleEventRepositoryProtocol
 
     var selectedDate: Date = .now
     private var allEvents: [CalendarEvent] = []
 
-    init(taskRepository: TaskRepositoryProtocol, journalRepository: JournalRepositoryProtocol, transactionRepository: TransactionRepositoryProtocol) {
+    init(
+        taskRepository: TaskRepositoryProtocol,
+        journalRepository: JournalRepositoryProtocol,
+        scheduleEventRepository: ScheduleEventRepositoryProtocol
+    ) {
         self.taskRepository = taskRepository
         self.journalRepository = journalRepository
-        self.transactionRepository = transactionRepository
+        self.scheduleEventRepository = scheduleEventRepository
     }
 
     func load() {
@@ -29,21 +33,32 @@ final class CalendarViewModel {
         if let entries = try? journalRepository.fetchAll() {
             events += entries.map(CalendarEvent.init(journal:))
         }
-        if let bills = try? transactionRepository.fetchUpcomingBills() {
-            events += bills.map(CalendarEvent.init(bill:))
+        if let scheduled = try? scheduleEventRepository.fetchAll() {
+            events += scheduled.map(CalendarEvent.init(schedule:))
         }
         allEvents = events
     }
 
     func events(on date: Date) -> [CalendarEvent] {
-        allEvents.filter { $0.date.isSameDay(as: date) }
+        allEvents.filter { $0.date.isSameDay(as: date) }.sorted { $0.date < $1.date }
     }
 
     var selectedDayEvents: [CalendarEvent] {
-        events(on: selectedDate).sorted { $0.date < $1.date }
+        events(on: selectedDate)
     }
 
+    /// Everything from today onward, across all days — the "next up" agenda view.
     var upcomingEvents: [CalendarEvent] {
         allEvents.filter { $0.date >= Date.now.startOfDay }.sorted { $0.date < $1.date }
+    }
+
+    func addScheduleEvent(_ event: ScheduleEvent) {
+        scheduleEventRepository.save(event)
+        load()
+    }
+
+    func deleteScheduleEvent(_ event: ScheduleEvent) {
+        scheduleEventRepository.delete(event)
+        load()
     }
 }
