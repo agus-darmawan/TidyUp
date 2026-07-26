@@ -12,13 +12,13 @@ struct AddClothingItemView: View {
     let onSave: (ClothingItem) -> Void
 
     @State private var name = ""
-    @State private var category: ClothingCategory = .tops
+    @State private var category: ClothingCategory = .casual
     @State private var brand = ""
     @State private var color = ""
     @State private var notes = ""
     @State private var hasPurchaseDate = false
     @State private var purchaseDate = Date.now
-    @State private var replacementIntervalText = "180"
+    @State private var usageDurationText = "7"
 
     var body: some View {
         NavigationStack {
@@ -31,6 +31,11 @@ struct AddClothingItemView: View {
                             Label(cat.label, systemImage: cat.icon).tag(cat)
                         }
                     }
+                    .onChange(of: category) { _, newValue in
+                        if newValue.usesDurationCycle {
+                            usageDurationText = "\(newValue.defaultUsageDurationDays)"
+                        }
+                    }
                 }
 
                 Section("Attributes") {
@@ -38,14 +43,14 @@ struct AddClothingItemView: View {
                     TextField("Color", text: $color)
                 }
 
-                if category.isLinen {
+                if category.usesDurationCycle {
                     Section {
-                        TextField("Replace every (days)", text: $replacementIntervalText)
+                        TextField("Wash every (days)", text: $usageDurationText)
                             .keyboardType(.numberPad)
                     } header: {
-                        Text("Replacement Cycle")
+                        Text("Wear Cycle")
                     } footer: {
-                        Text("You'll get a reminder once this item passes its replacement cycle — e.g. 180 days for a towel.")
+                        Text("This item won't be marked dirty after a single wear — it stays in use for this many days before needing a wash.")
                     }
                 }
 
@@ -80,7 +85,7 @@ struct AddClothingItemView: View {
             color: color,
             notes: notes,
             purchaseDate: hasPurchaseDate ? purchaseDate : nil,
-            replacementIntervalDays: category.isLinen ? Int(replacementIntervalText) : nil
+            usageDurationDays: category.usesDurationCycle ? Int(usageDurationText) : nil
         )
         onSave(item)
         dismiss()

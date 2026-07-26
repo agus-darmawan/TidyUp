@@ -63,14 +63,11 @@ struct ClothingDetailView: View {
                 }
             }
 
-            if item.category.isLinen {
-                Section("Replacement") {
-                    if let days = item.daysUntilReplacement {
-                        LabeledContent("Days Until Replace", value: days > 0 ? "\(days) days" : "Overdue")
-                    }
-                    if item.needsReplacement {
-                        Button("Mark as Replaced") { viewModel?.markReplaced(item) }
-                            .foregroundStyle(AppTheme.Colors.danger)
+            if item.usageDurationDays != nil {
+                Section("Wear Cycle") {
+                    LabeledContent("Wash Every", value: "\(item.usageDurationDays ?? 0) days")
+                    if let remaining = item.daysRemainingInCycle {
+                        LabeledContent("Days Left", value: remaining > 0 ? "\(remaining) days" : "Wash now")
                     }
                 }
             }

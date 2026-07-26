@@ -2,13 +2,19 @@
 //  WardrobeView.swift
 //  TidyUp
 //
+//  Main feature here is logging wear time. Tap items into "today's
+//  outfit" cart, then confirm once from the bottom bar — the classic
+//  add-to-cart-then-checkout flow, applied to getting dressed.
+//
 
 import SwiftUI
 
 struct WardrobeView: View {
     @Environment(DependencyContainer.self) private var container
     @State private var viewModel: WardrobeViewModel?
+    @State private var cart = OutfitCartViewModel()
     @State private var showingAdd = false
+    @State private var showingConfirmSheet = false
 
     var body: some View {
         NavigationStack {
@@ -53,8 +59,8 @@ struct WardrobeView: View {
             CategoryFilterBar(selected: $viewModel.selectedCategory)
                 .padding(.horizontal)
 
-            if !viewModel.itemsNeedingReplacement.isEmpty {
-                replacementBanner(viewModel.itemsNeedingReplacement.count)
+            if !viewModel.itemsNeedingWash.isEmpty {
+                washSoonBanner(viewModel.itemsNeedingWash.count)
                     .padding(.horizontal)
             }
 
@@ -70,7 +76,8 @@ struct WardrobeView: View {
                                 ClothingRowView(
                                     item: item,
                                     thumbnail: item.photoFilenames.first.flatMap { viewModel.loadImage(filename: $0) },
-                                    onWear: { viewModel.wear(item) },
+                                    isSelected: cart.isSelected(item),
+                                    onToggleSelect: { cart.toggle(item) },
                                     onWashed: { viewModel.markWashed(item) }
                                 )
                             }
@@ -78,19 +85,42 @@ struct WardrobeView: View {
                         }
                     }
                     .padding(.horizontal)
-                    .padding(.bottom, AppTheme.Spacing.xxl)
+                    .padding(.bottom, cart.isEmpty ? AppTheme.Spacing.xxl : 80)
                 }
             }
         }
         .padding(.top, AppTheme.Spacing.sm)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .searchable(text: $viewModel.searchText, prompt: "Search by name, brand, code")
+        .overlay(alignment: .bottom) {
+            if !cart.isEmpty {
+                confirmBar(viewModel)
+            }
+        }
     }
 
-    private func replacementBanner(_ count: Int) -> some View {
+    private func confirmBar(_ viewModel: WardrobeViewModel) -> some View {
+        Button {
+            viewModel.confirmOutfit(cart.selectedItemIDs)
+            cart.clear()
+        } label: {
+            HStack {
+                Image(systemName: "checkmark.circle.fill")
+                Text("Confirm Wear (\(cart.count))")
+                    .fontWeight(.semibold)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, AppTheme.Spacing.md)
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(AppTheme.Colors.accent)
+        .padding(.horizontal)
+        .padding(.bottom, AppTheme.Spacing.sm)
+    }
+
+    private func washSoonBanner(_ count: Int) -> some View {
         HStack {
             Image(systemName: "exclamationmark.triangle.fill")
-            Text("\(count) item(s) need replacement").font(.system(size: 13, weight: .medium))
+            Text("\(count) item(s) need washing soon").font(.system(size: 13, weight: .medium))
             Spacer()
         }
         .foregroundStyle(AppTheme.Colors.contrastingText(on: AppTheme.Colors.warning))

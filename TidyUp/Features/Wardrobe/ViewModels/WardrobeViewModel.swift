@@ -15,7 +15,6 @@ final class WardrobeViewModel {
 
     var items: [ClothingItem] = []
     var selectedCategory: ClothingCategory?
-    var searchText: String = ""
 
     init(repository: WardrobeRepositoryProtocol, imageStorageService: ImageStorageService, notificationService: NotificationService) {
         self.repository = repository
@@ -28,22 +27,16 @@ final class WardrobeViewModel {
     }
 
     var filteredItems: [ClothingItem] {
-        var result = items
-        if let selectedCategory {
-            result = result.filter { $0.category == selectedCategory }
-        }
-        if !searchText.isEmpty {
-            result = result.filter {
-                $0.name.localizedCaseInsensitiveContains(searchText) ||
-                $0.itemCode.localizedCaseInsensitiveContains(searchText) ||
-                $0.brand.localizedCaseInsensitiveContains(searchText)
-            }
-        }
-        return result
+        guard let selectedCategory else { return items }
+        return items.filter { $0.category == selectedCategory }
     }
 
-    var itemsNeedingReplacement: [ClothingItem] {
-        items.filter(\.needsReplacement)
+    /// Jackets/linens that are approaching or past the end of their wear cycle.
+    var itemsNeedingWash: [ClothingItem] {
+        items.filter { item in
+            guard let remaining = item.daysRemainingInCycle else { return false }
+            return remaining <= 1
+        }
     }
 
     func nextItemCode() -> String {
@@ -52,37 +45,29 @@ final class WardrobeViewModel {
 
     func addItem(_ item: ClothingItem) {
         repository.save(item)
-        if item.category.isLinen, let interval = item.replacementIntervalDays, let start = item.lastReplacedDate {
-            notificationService.scheduleReplacementReminder(
-                id: item.id, itemName: item.name,
-                dueDate: start.adding(days: interval)
-            )
-        }
         load()
     }
 
-    /// One-tap "wear this" straight from the list row — no need to open detail first.
+    /// One-tap "wear this" straight from the list row.
     func wear(_ item: ClothingItem) {
         item.markWorn()
         repository.save(item)
         load()
     }
 
-    func markWashed(_ item: ClothingItem) {
-        item.markWashed()
-        repository.save(item)
+    /// Confirms an entire "outfit cart" selection at once — logs a wear
+    /// for every selected item in a single action.
+    func confirmOutfit(_ itemIDs: Set<UUID>) {
+        for item in items where itemIDs.contains(item.id) {
+            item.markWorn()
+            repository.save(item)
+        }
         load()
     }
 
-    func markReplaced(_ item: ClothingItem) {
-        item.markReplaced()
+    func markWashed(_ item: ClothingItem) {
+        item.markWashed()
         repository.save(item)
-        if let interval = item.replacementIntervalDays {
-            notificationService.scheduleReplacementReminder(
-                id: item.id, itemName: item.name,
-                dueDate: Date.now.adding(days: interval)
-            )
-        }
         load()
     }
 

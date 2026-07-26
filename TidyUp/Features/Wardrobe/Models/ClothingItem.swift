@@ -2,51 +2,54 @@
 //  ClothingItem.swift
 //  TidyUp
 //
-//  v2: no stock count — every physical item is unique (own itemCode),
-//  since you don't own duplicates of the exact same piece. `.linens`
-//  covers towels/bedsheets, which need periodic-replacement tracking
-//  instead of just clean/dirty tracking.
+//  v3: categories now reflect purpose (Work, Casual, Prayer, ...) rather
+//  than raw garment type. Every physical item is still unique — no stock
+//  counts. Most categories go dirty the instant they're worn (perWear),
+//  but Outerwear (jackets) and Linens (blankets/bedsheets) use a
+//  duration-based cycle instead — they stay "in use" for N days before
+//  needing a wash, since you don't wash a jacket after one wear.
 //
 
 import Foundation
 import SwiftData
 
 enum ClothingCategory: String, Codable, CaseIterable, Identifiable {
-    case tops, bottoms, underwear, outerwear, sleepwear, sportswear, shoes, accessories, linens, other
+    case work, casual, bottoms, underwear, prayer, outerwear, linens, others
     var id: String { rawValue }
 
     var label: String {
         switch self {
-        case .tops: "Tops"
-        case .bottoms: "Bottoms"
+        case .work: "Work"
+        case .casual: "Casual"
+        case .bottoms: "Pants"
         case .underwear: "Underwear"
-        case .outerwear: "Outerwear"
-        case .sleepwear: "Sleepwear"
-        case .sportswear: "Sportswear"
-        case .shoes: "Shoes"
-        case .accessories: "Accessories"
-        case .linens: "Linens (Towel/Bedsheet)"
-        case .other: "Other"
+        case .prayer: "Prayer"
+        case .outerwear: "Outerwear (Jacket)"
+        case .linens: "Linens (Blanket/Bedsheet)"
+        case .others: "Others"
         }
     }
 
     var icon: String {
         switch self {
-        case .tops: "tshirt.fill"
+        case .work: "briefcase.fill"
+        case .casual: "tshirt.fill"
         case .bottoms: "figure.walk"
         case .underwear: "square.stack.fill"
+        case .prayer: "hands.sparkles.fill"
         case .outerwear: "cloud.fill"
-        case .sleepwear: "moon.fill"
-        case .sportswear: "figure.run"
-        case .shoes: "shoe.fill"
-        case .accessories: "eyeglasses"
         case .linens: "bed.double.fill"
-        case .other: "shippingbox.fill"
+        case .others: "shippingbox.fill"
         }
     }
 
-    /// Linens follow a replace-by-interval cycle instead of simple clean/dirty.
-    var isLinen: Bool { self == .linens }
+    /// These categories don't go dirty after a single wear — they're used
+    /// continuously for a set number of days before needing a wash.
+    var usesDurationCycle: Bool { self == .outerwear || self == .linens }
+
+    var defaultUsageDurationDays: Int {
+        self == .outerwear ? 7 : 30
+    }
 }
 
 enum LaundryStatus: String, Codable {
@@ -72,9 +75,10 @@ final class ClothingItem {
     var lastWashedDate: Date?
     var wearCountSinceWash: Int
 
-    // Linens-only: replace-by-interval tracking.
-    var replacementIntervalDays: Int?
-    var lastReplacedDate: Date?
+    /// Duration-based wear cycle (jackets/linens only). `nil` for
+    /// everything else, meaning "goes dirty after a single wear".
+    var usageDurationDays: Int?
+    var wearCycleStartDate: Date?
 
     init(
         id: UUID = UUID(),
@@ -86,7 +90,7 @@ final class ClothingItem {
         notes: String = "",
         photoFilenames: [String] = [],
         purchaseDate: Date? = nil,
-        replacementIntervalDays: Int? = nil
+        usageDurationDays: Int? = nil
     ) {
         self.id = id
         self.itemCode = itemCode
@@ -100,12 +104,11 @@ final class ClothingItem {
         self.createdAt = .now
         self.laundryStatusRaw = LaundryStatus.clean.rawValue
         self.wearCountSinceWash = 0
-        self.replacementIntervalDays = category.isLinen ? (replacementIntervalDays ?? 180) : nil
-        self.lastReplacedDate = category.isLinen ? .now : nil
+        self.usageDurationDays = category.usesDurationCycle ? (usageDurationDays ?? category.defaultUsageDurationDays) : nil
     }
 
     var category: ClothingCategory {
-        get { ClothingCategory(rawValue: categoryRaw) ?? .other }
+        get { ClothingCategory(rawValue: categoryRaw) ?? .others }
         set { categoryRaw = newValue.rawValue }
     }
 
@@ -114,31 +117,33 @@ final class ClothingItem {
         set { laundryStatusRaw = newValue.rawValue }
     }
 
-    /// One-tap action from the list row: "I'm wearing this today".
+    /// Logs a wear. Regular items go dirty immediately; jackets/linens
+    /// only go dirty once their usage cycle (in days) has elapsed.
     func markWorn() {
         lastWornDate = .now
         wearCountSinceWash += 1
-        laundryStatusRaw = LaundryStatus.dirty.rawValue
+
+        guard let durationDays = usageDurationDays else {
+            laundryStatusRaw = LaundryStatus.dirty.rawValue
+            return
+        }
+
+        if wearCycleStartDate == nil { wearCycleStartDate = .now }
+        if let cycleStart = wearCycleStartDate, Date.now.daysSince(cycleStart) >= durationDays {
+            laundryStatusRaw = LaundryStatus.dirty.rawValue
+        }
     }
 
     func markWashed() {
         lastWashedDate = .now
         wearCountSinceWash = 0
+        wearCycleStartDate = nil
         laundryStatusRaw = LaundryStatus.clean.rawValue
     }
 
-    /// For linens: true once it's past its replacement interval.
-    var needsReplacement: Bool {
-        guard category.isLinen, let interval = replacementIntervalDays, let lastReplaced = lastReplacedDate else { return false }
-        return Date.now.daysSince(lastReplaced) >= interval
-    }
-
-    var daysUntilReplacement: Int? {
-        guard category.isLinen, let interval = replacementIntervalDays, let lastReplaced = lastReplacedDate else { return nil }
-        return interval - Date.now.daysSince(lastReplaced)
-    }
-
-    func markReplaced() {
-        lastReplacedDate = .now
+    /// Days remaining before a duration-cycle item (jacket/linen) needs washing.
+    var daysRemainingInCycle: Int? {
+        guard let durationDays = usageDurationDays, let cycleStart = wearCycleStartDate else { return nil }
+        return max(0, durationDays - Date.now.daysSince(cycleStart))
     }
 }
