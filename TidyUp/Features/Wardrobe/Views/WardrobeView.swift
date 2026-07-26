@@ -33,13 +33,6 @@ struct WardrobeView: View {
             .navigationTitle("Wardrobe")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        layout = layout == .grid ? .list : .grid
-                    } label: {
-                        Image(systemName: layout == .grid ? "list.bullet" : "square.grid.2x2")
-                    }
-                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { showingAdd = true } label: { Image(systemName: "plus.circle.fill") }
                 }
@@ -72,8 +65,20 @@ struct WardrobeView: View {
             statStrip(viewModel)
                 .padding(.horizontal)
 
-            CategoryFilterBar(selected: $viewModel.selectedCategory)
-                .padding(.horizontal)
+            HStack(spacing: AppTheme.Spacing.sm) {
+                CategoryFilterBar(selected: $viewModel.selectedCategory)
+                Button {
+                    withAnimation(AppTheme.Motion.snappy) { layout = layout == .grid ? .list : .grid }
+                } label: {
+                    Image(systemName: layout == .grid ? "list.bullet" : "square.grid.2x2")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(AppTheme.Colors.primaryText)
+                        .frame(width: 32, height: 32)
+                        .background(AppTheme.Colors.surface)
+                        .clipShape(Circle())
+                }
+            }
+            .padding(.horizontal)
 
             if !viewModel.itemsNeedingWash.isEmpty {
                 washSoonBanner(viewModel.itemsNeedingWash.count)
