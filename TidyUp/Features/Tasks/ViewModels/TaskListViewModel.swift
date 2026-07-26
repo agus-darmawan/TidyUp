@@ -37,6 +37,14 @@ final class TaskListViewModel {
         tasks = (try? repository.fetchAll()) ?? []
     }
 
+    var todayTasks: [TaskItem] {
+        tasks.filter { $0.dueDate?.isToday == true }
+    }
+
+    var todayCompletedCount: Int {
+        todayTasks.filter(\.isDone).count
+    }
+
     var filteredTasks: [TaskItem] {
         var result = tasks
         switch filter {

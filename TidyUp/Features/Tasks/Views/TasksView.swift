@@ -20,6 +20,7 @@ struct TasksView: View {
                 }
             }
             .navigationTitle("Tasks")
+            .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { showingAdd = true } label: {
@@ -46,6 +47,9 @@ struct TasksView: View {
     private func content(_ viewModel: TaskListViewModel) -> some View {
         @Bindable var viewModel = viewModel
         VStack(spacing: AppTheme.Spacing.sm) {
+            TaskProgressHeader(completed: viewModel.todayCompletedCount, total: viewModel.todayTasks.count)
+                .padding(.horizontal)
+
             TaskFilterBar(selected: $viewModel.filter)
                 .padding(.horizontal)
 
