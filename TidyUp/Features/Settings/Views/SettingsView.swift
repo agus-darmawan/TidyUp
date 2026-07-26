@@ -43,7 +43,13 @@ struct SettingsView: View {
         List {
             Section("Data") {
                 NavigationLink { CategoryManagementView() } label: {
-                    SettingsIconRow(icon: "tag.fill", tint: AppTheme.Colors.accent, title: "Manage Categories")
+                    SettingsIconRow(icon: "tag.fill", tint: AppTheme.Colors.accent, title: "Manage Money Categories")
+                }
+                NavigationLink { TaskTagsView() } label: {
+                    SettingsIconRow(icon: "checklist", tint: AppTheme.Colors.success, title: "Task Tags in Use")
+                }
+                NavigationLink { WardrobeCategoriesView() } label: {
+                    SettingsIconRow(icon: "tshirt.fill", tint: AppTheme.Colors.warning, title: "Wardrobe Categories")
                 }
             }
 
@@ -55,6 +61,54 @@ struct SettingsView: View {
             }
         }
         .navigationTitle("Settings")
+    }
+}
+
+/// Read-only reference: distinct tags currently used across your tasks,
+/// with how many tasks use each one.
+struct TaskTagsView: View {
+    @Environment(DependencyContainer.self) private var container
+    @State private var tagCounts: [(tag: String, count: Int)] = []
+
+    var body: some View {
+        List {
+            if tagCounts.isEmpty {
+                Text("No tags in use yet — add tags when creating or editing a task.")
+                    .font(AppTheme.Typography.footnote)
+                    .foregroundStyle(AppTheme.Colors.secondaryText)
+            } else {
+                ForEach(tagCounts, id: \.tag) { entry in
+                    SettingsIconRow(icon: "tag.fill", tint: AppTheme.Colors.success, title: entry.tag, value: "\(entry.count)")
+                }
+            }
+        }
+        .navigationTitle("Task Tags")
+        .onAppear {
+            let tasks = (try? container.taskRepository.fetchAll()) ?? []
+            let allTags = tasks.flatMap(\.tags)
+            let grouped = Dictionary(grouping: allTags) { $0 }
+            tagCounts = grouped.map { (tag: $0.key, count: $0.value.count) }.sorted { $0.count > $1.count }
+        }
+    }
+}
+
+/// Read-only reference for Wardrobe's built-in categories — these are
+/// fixed (not user-editable) since every category also drives wash-cycle
+/// behavior (e.g. Outerwear/Linens use a duration cycle).
+struct WardrobeCategoriesView: View {
+    var body: some View {
+        List {
+            ForEach(ClothingCategory.allCases) { category in
+                SettingsIconRow(icon: category.icon, tint: AppTheme.Colors.warning, title: category.label)
+            }
+        } 
+        .navigationTitle("Wardrobe Categories")
+        .safeAreaInset(edge: .bottom) {
+            Text("These are built-in and drive wash-cycle behavior, so they aren't user-editable.")
+                .font(AppTheme.Typography.caption)
+                .foregroundStyle(AppTheme.Colors.secondaryText)
+                .padding()
+        }
     }
 }
 
