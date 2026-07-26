@@ -164,28 +164,25 @@ struct FinanceView: View {
     }
 
     private func statPill(title: String, amount: Decimal, color: Color, icon: String) -> some View {
-        HStack(spacing: AppTheme.Spacing.xs) {
-            Image(systemName: icon)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(color)
-                .frame(width: 30, height: 30)
-                .background(color.opacity(0.12))
-                .clipShape(Circle())
-            VStack(alignment: .leading, spacing: 1) {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(color)
                 Text(title.uppercased())
                     .font(.system(size: 10, weight: .semibold))
                     .tracking(0.3)
                     .foregroundStyle(AppTheme.Colors.secondaryText)
-                Text(CurrencyFormatter.format(amount))
-                    .font(.system(size: 15, weight: .bold, design: .rounded))
-                    .foregroundStyle(color)
-                    .contentTransition(.numericText())
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
             }
+            Text(CurrencyFormatter.format(amount))
+                .font(.system(size: 17, weight: .bold, design: .rounded))
+                .foregroundStyle(color)
+                .contentTransition(.numericText())
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(AppTheme.Spacing.sm)
+        .padding(AppTheme.Spacing.md)
         .background(AppTheme.Colors.surface)
         .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
     }
