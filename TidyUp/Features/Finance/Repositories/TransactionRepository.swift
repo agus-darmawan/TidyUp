@@ -9,6 +9,7 @@
 import Foundation
 import SwiftData
 
+@MainActor
 protocol TransactionRepositoryProtocol {
     func fetchAll() throws -> [Transaction]
     func fetchToday() throws -> [Transaction]
@@ -25,6 +26,7 @@ protocol TransactionRepositoryProtocol {
     var pendingReimburseTotal: Decimal { get }
 }
 
+@MainActor
 final class TransactionRepository: TransactionRepositoryProtocol {
     private let context: ModelContext
     private let accountRepository: AccountRepositoryProtocol

@@ -6,6 +6,7 @@
 import Foundation
 import SwiftData
 
+@MainActor
 protocol JournalRepositoryProtocol {
     func fetchAll() throws -> [JournalEntry]
     func fetchRecent(limit: Int) throws -> [JournalEntry]
@@ -13,6 +14,7 @@ protocol JournalRepositoryProtocol {
     func delete(_ entry: JournalEntry)
 }
 
+@MainActor
 final class JournalRepository: JournalRepositoryProtocol {
     private let context: ModelContext
 

@@ -6,6 +6,7 @@
 import Foundation
 import SwiftData
 
+@MainActor
 protocol WardrobeRepositoryProtocol {
     func fetchAll() throws -> [ClothingItem]
     func save(_ item: ClothingItem)
@@ -13,6 +14,7 @@ protocol WardrobeRepositoryProtocol {
     func nextItemCode() -> String
 }
 
+@MainActor
 final class WardrobeRepository: WardrobeRepositoryProtocol {
     private let context: ModelContext
 

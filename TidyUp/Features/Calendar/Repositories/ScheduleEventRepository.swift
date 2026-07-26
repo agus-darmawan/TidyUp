@@ -6,12 +6,14 @@
 import Foundation
 import SwiftData
 
+@MainActor
 protocol ScheduleEventRepositoryProtocol {
     func fetchAll() throws -> [ScheduleEvent]
     func save(_ event: ScheduleEvent)
     func delete(_ event: ScheduleEvent)
 }
 
+@MainActor
 final class ScheduleEventRepository: ScheduleEventRepositoryProtocol {
     private let context: ModelContext
 

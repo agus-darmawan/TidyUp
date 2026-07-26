@@ -6,6 +6,7 @@
 import Foundation
 import SwiftData
 
+@MainActor
 protocol AccountRepositoryProtocol {
     func fetchAll() throws -> [Account]
     func save(_ account: Account)
@@ -13,6 +14,7 @@ protocol AccountRepositoryProtocol {
     var totalNetWorth: Decimal { get }
 }
 
+@MainActor
 final class AccountRepository: AccountRepositoryProtocol {
     private let context: ModelContext
 

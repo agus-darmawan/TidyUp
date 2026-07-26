@@ -6,6 +6,7 @@
 import Foundation
 import SwiftData
 
+@MainActor
 protocol TaskRepositoryProtocol {
     func fetchAll() throws -> [TaskItem]
     func fetchDue(on date: Date) throws -> [TaskItem]
@@ -14,6 +15,7 @@ protocol TaskRepositoryProtocol {
     func toggleDone(_ item: TaskItem)
 }
 
+@MainActor
 final class TaskRepository: TaskRepositoryProtocol {
     private let context: ModelContext
 
