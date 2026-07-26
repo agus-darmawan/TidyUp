@@ -24,6 +24,11 @@ final class TaskRepositoryTests: XCTestCase {
         repository = TaskRepository(context: context)
     }
 
+    override func tearDownWithError() throws {
+        context = nil
+        repository = nil
+    }
+
     func testSaveInsertsNewTask() throws {
         let task = TaskItem(title: "Buy groceries")
         repository.save(task)
