@@ -2,8 +2,9 @@
 //  AddEditTransactionView.swift
 //  TidyUp
 //
-//  Reimbursable expenses require both a receipt photo AND an item photo
-//  before they can be saved — enforced here.
+//  "Reimbursement" is its own Type option — no separate toggle needed.
+//  Picking that type automatically requires a receipt photo AND an item
+//  photo before the transaction can be saved.
 //
 
 import SwiftUI
@@ -26,7 +27,6 @@ struct AddEditTransactionView: View {
     @State private var toAccount: Account?
     @State private var category: TransactionCategory?
 
-    @State private var isReimbursable: Bool
     @State private var receiptImage: UIImage?
     @State private var itemImage: UIImage?
     @State private var receiptPickerItem: PhotosPickerItem?
@@ -35,6 +35,9 @@ struct AddEditTransactionView: View {
     @State private var isRecurring: Bool
     @State private var recurrence: RecurrenceFrequency
     @State private var showingMissingPhotoAlert = false
+
+    /// Reimbursement is a Type choice, not a separate flag.
+    private var isReimbursement: Bool { type == .reimbursement }
 
     init(transaction: Transaction?, accounts: [Account], categories: [TransactionCategory], onSaved: @escaping () -> Void) {
         self.existingTransaction = transaction
@@ -48,7 +51,6 @@ struct AddEditTransactionView: View {
         _fromAccount = State(initialValue: transaction?.fromAccount ?? accounts.first)
         _toAccount = State(initialValue: transaction?.toAccount)
         _category = State(initialValue: transaction?.category)
-        _isReimbursable = State(initialValue: transaction?.isReimbursable ?? false)
         _isRecurring = State(initialValue: transaction?.isRecurring ?? false)
         _recurrence = State(initialValue: transaction?.recurrenceFrequency ?? .monthly)
     }
@@ -60,8 +62,6 @@ struct AddEditTransactionView: View {
                     Picker("Type", selection: $type) {
                         ForEach(TransactionType.allCases) { Text($0.label).tag($0) }
                     }
-                    .onChange(of: type) { _, newValue in if newValue != .expense { isReimbursable = false } }
-
                     TextField("Amount", text: $amountText).keyboardType(.decimalPad)
                     TextField("Note", text: $note)
                     DatePicker("Date", selection: $date, displayedComponents: [.date, .hourAndMinute])
@@ -79,42 +79,41 @@ struct AddEditTransactionView: View {
                     }
                 }
 
-                if type == .expense || type == .reimbursement {
+                if type == .expense || isReimbursement {
                     CategoryPicker(categories: categories, selected: $category) { newName in
                         category = container.transactionRepository.addCategory(name: newName, icon: "tag.fill")
                         categories.append(category!)
                     }
+                }
 
+                if isReimbursement {
                     Section {
-                        Toggle("Reimbursable expense", isOn: $isReimbursable)
-                        if isReimbursable {
-                            Text("Receipt and item photos are required for reimbursement.")
-                                .font(.system(size: 12)).foregroundStyle(AppTheme.Colors.secondaryText)
+                        Text("Receipt and item photos are required for reimbursement.")
+                            .font(.system(size: 12)).foregroundStyle(AppTheme.Colors.secondaryText)
 
-                            PhotosPicker(selection: $receiptPickerItem, matching: .images) {
-                                photoRow(title: "Receipt Photo", image: reimbursementReceiptPreview)
-                            }
-                            .onChange(of: receiptPickerItem) { _, newValue in
-                                Task {
-                                    if let data = try? await newValue?.loadTransferable(type: Data.self) {
-                                        receiptImage = UIImage(data: data)
-                                    }
+                        PhotosPicker(selection: $receiptPickerItem, matching: .images) {
+                            photoRow(title: "Receipt Photo", image: reimbursementReceiptPreview)
+                        }
+                        .onChange(of: receiptPickerItem) { _, newValue in
+                            Task {
+                                if let data = try? await newValue?.loadTransferable(type: Data.self) {
+                                    receiptImage = UIImage(data: data)
                                 }
                             }
+                        }
 
-                            PhotosPicker(selection: $itemPickerItem, matching: .images) {
-                                photoRow(title: "Item Photo", image: reimbursementItemPreview)
-                            }
-                            .onChange(of: itemPickerItem) { _, newValue in
-                                Task {
-                                    if let data = try? await newValue?.loadTransferable(type: Data.self) {
-                                        itemImage = UIImage(data: data)
-                                    }
+                        PhotosPicker(selection: $itemPickerItem, matching: .images) {
+                            photoRow(title: "Item Photo", image: reimbursementItemPreview)
+                        }
+                        .onChange(of: itemPickerItem) { _, newValue in
+                            Task {
+                                if let data = try? await newValue?.loadTransferable(type: Data.self) {
+                                    itemImage = UIImage(data: data)
                                 }
                             }
                         }
                     } header: {
-                        Text("Reimbursement")
+                        Text("Reimbursement Proof")
                     }
                 }
 
@@ -138,7 +137,7 @@ struct AddEditTransactionView: View {
             .alert("Missing Photos", isPresented: $showingMissingPhotoAlert) {
                 Button("OK", role: .cancel) {}
             } message: {
-                Text("Reimbursable expenses require both a receipt photo and an item photo before saving.")
+                Text("Reimbursement requires both a receipt photo and an item photo before saving.")
             }
         }
     }
@@ -172,7 +171,7 @@ struct AddEditTransactionView: View {
     private func attemptSave() {
         guard let amount = Decimal(string: amountText), let fromAccount else { return }
 
-        if isReimbursable {
+        if isReimbursement {
             guard reimbursementReceiptPreview != nil, reimbursementItemPreview != nil else {
                 showingMissingPhotoAlert = true
                 return
@@ -190,11 +189,11 @@ struct AddEditTransactionView: View {
         transaction.fromAccount = fromAccount
         transaction.toAccount = type == .transfer ? toAccount : nil
         transaction.category = category
-        transaction.isReimbursable = isReimbursable
+        transaction.isReimbursable = isReimbursement
         transaction.isRecurring = isRecurring
         transaction.recurrenceFrequency = isRecurring ? recurrence : .none
 
-        if isReimbursable {
+        if isReimbursement {
             if let receiptImage { transaction.receiptImageFilename = try? container.imageStorageService.saveImage(receiptImage) }
             if let itemImage { transaction.itemImageFilename = try? container.imageStorageService.saveImage(itemImage) }
         }

@@ -30,20 +30,29 @@ final class ReimbursementViewModel {
     }
 
     var totalPending: Decimal {
-        reimbursements.filter { $0.reimburseStatus != .paid }.reduce(Decimal(0)) { $0 + $1.amount }
+        reimbursements.filter { $0.reimburseStatus != .paid && $0.reimburseStatus != .rejected }.reduce(Decimal(0)) { $0 + $1.amount }
     }
 
-    /// Only transactions with both mandatory photos can go into a submittable report.
+    /// Only transactions with both mandatory photos, and that haven't been
+    /// rejected, can go into a submittable report.
     var reportReadyTransactions: [Transaction] {
-        reimbursements.filter(\.hasRequiredReimbursementProof)
+        reimbursements.filter { $0.hasRequiredReimbursementProof && $0.reimburseStatus != .rejected }
     }
 
     var missingProofCount: Int {
-        reimbursements.count - reportReadyTransactions.count
+        reimbursements.filter { $0.reimburseStatus != .rejected }.count - reportReadyTransactions.count
     }
 
     func markPaid(_ transaction: Transaction, creditTo account: Account) {
         transactionRepository.markReimbursementPaid(transaction, creditTo: account)
+        load()
+    }
+
+    /// Rejected by the office — it's excluded from the pending total and
+    /// the PDF report from now on, and effectively becomes a personal
+    /// expense (the balance already reflects this; nothing else changes).
+    func markRejected(_ transaction: Transaction) {
+        transactionRepository.markReimbursementRejected(transaction)
         load()
     }
 

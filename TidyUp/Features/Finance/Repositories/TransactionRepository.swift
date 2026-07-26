@@ -19,6 +19,7 @@ protocol TransactionRepositoryProtocol {
     func save(_ transaction: Transaction, previousAmount: Decimal?, previousType: TransactionType?)
     func delete(_ transaction: Transaction)
     func markReimbursementPaid(_ transaction: Transaction, creditTo account: Account)
+    func markReimbursementRejected(_ transaction: Transaction)
     func seedDefaultCategoriesIfNeeded()
     var pendingReimburseTotal: Decimal { get }
 }
@@ -59,7 +60,7 @@ final class TransactionRepository: TransactionRepositoryProtocol {
 
     var pendingReimburseTotal: Decimal {
         let items = (try? fetchReimbursable()) ?? []
-        return items.filter { $0.reimburseStatus != .paid }.reduce(Decimal(0)) { $0 + $1.amount }
+        return items.filter { $0.reimburseStatus != .paid && $0.reimburseStatus != .rejected }.reduce(Decimal(0)) { $0 + $1.amount }
     }
 
     func fetchCategories() throws -> [TransactionCategory] {
@@ -99,6 +100,15 @@ final class TransactionRepository: TransactionRepositoryProtocol {
     func markReimbursementPaid(_ transaction: Transaction, creditTo account: Account) {
         transaction.reimburseStatus = .paid
         account.balance += transaction.amount
+        try? context.save()
+    }
+
+    /// Rejected by the office — the money already left the account when
+    /// the expense was logged, so no balance change is needed. It simply
+    /// stops counting as pending reimbursement and becomes, in effect,
+    /// an ordinary personal expense.
+    func markReimbursementRejected(_ transaction: Transaction) {
+        transaction.reimburseStatus = .rejected
         try? context.save()
     }
 

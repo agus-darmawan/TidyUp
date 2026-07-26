@@ -72,8 +72,9 @@ struct ReimbursementView: View {
                             }
                         }
                         .swipeActions {
-                            if transaction.reimburseStatus != .paid {
+                            if transaction.reimburseStatus != .paid && transaction.reimburseStatus != .rejected {
                                 Button("Mark Paid") { showingMarkPaidFor = transaction }.tint(AppTheme.Colors.success)
+                                Button("Reject", role: .destructive) { viewModel.markRejected(transaction) }
                             }
                         }
                     }

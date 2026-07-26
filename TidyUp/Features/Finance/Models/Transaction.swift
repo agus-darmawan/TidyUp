@@ -36,13 +36,14 @@ enum TransactionType: String, Codable, CaseIterable, Identifiable {
 }
 
 enum ReimburseStatus: String, Codable, CaseIterable, Identifiable {
-    case pending, submitted, paid
+    case pending, submitted, paid, rejected
     var id: String { rawValue }
     var label: String {
         switch self {
         case .pending: "Pending"
         case .submitted: "Submitted"
         case .paid: "Paid"
+        case .rejected: "Rejected"
         }
     }
 }
