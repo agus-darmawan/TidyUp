@@ -40,7 +40,7 @@ struct CalendarEvent: Identifiable {
     let title: String
     let kind: CalendarEventKind
 
-    init(task: TaskItem) {
+    nonisolated init(task: TaskItem) {
         id = task.id
         date = task.dueDate ?? task.createdAt
         endDate = nil
@@ -48,7 +48,7 @@ struct CalendarEvent: Identifiable {
         kind = .task(task)
     }
 
-    init(schedule event: ScheduleEvent) {
+    nonisolated init(schedule event: ScheduleEvent) {
         id = event.id
         date = event.startDate
         endDate = event.endDate
@@ -56,7 +56,7 @@ struct CalendarEvent: Identifiable {
         kind = .schedule(event)
     }
 
-    init(journal entry: JournalEntry) {
+    nonisolated init(journal entry: JournalEntry) {
         id = entry.id
         date = entry.date
         endDate = nil

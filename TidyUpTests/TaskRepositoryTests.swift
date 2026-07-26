@@ -10,6 +10,7 @@ import XCTest
 import SwiftData
 @testable import TidyUp
 
+@MainActor
 final class TaskRepositoryTests: XCTestCase {
 
     private var context: ModelContext!
