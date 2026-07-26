@@ -76,6 +76,20 @@ enum AppTheme {
             let navyContrast = (bgLuminance + 0.05) / (navyLuminance + 0.05)
             return whiteContrast >= navyContrast ? .white : brandNavy
         }
+
+        /// Distinct gradients for the Money "wallet" cards, cycling by index
+        /// so each account reads as visually distinct at a glance.
+        static func walletGradient(for index: Int) -> LinearGradient {
+            let palettes: [[Color]] = [
+                [Color(hex: "#3B82F6"), Color(hex: "#1E40AF")],
+                [Color(hex: "#22C55E"), Color(hex: "#15803D")],
+                [Color(hex: "#8B5CF6"), Color(hex: "#5B21B6")],
+                [Color(hex: "#0F172A"), Color(hex: "#334155")],
+                [Color(hex: "#F59E0B"), Color(hex: "#B45309")]
+            ]
+            let colors = palettes[index % palettes.count]
+            return LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing)
+        }
     }
 
     enum Spacing {
@@ -102,12 +116,24 @@ enum AppTheme {
     }
 
     enum Typography {
-        static let largeTitle = Font.system(.largeTitle, design: .rounded).weight(.bold)
-        static let title = Font.system(.title2, design: .rounded).weight(.semibold)
-        static let headline = Font.headline
-        static let body = Font.body
-        static let subheadline = Font.subheadline
-        static let caption = Font.caption
-        static let monospacedAmount = Font.system(.title3, design: .rounded).weight(.semibold)
+        // Full semantic scale, all Dynamic-Type-aware (scales with the
+        // user's accessibility text size setting, per HIG).
+        static let display = Font.system(.largeTitle, design: .rounded).weight(.bold)
+        static let title1 = Font.system(.title, design: .rounded).weight(.bold)
+        static let title2 = Font.system(.title2, design: .rounded).weight(.semibold)
+        static let title3 = Font.system(.title3, design: .rounded).weight(.semibold)
+        static let headline = Font.system(.headline, design: .default).weight(.semibold)
+        static let body = Font.system(.body)
+        static let callout = Font.system(.callout)
+        static let subheadline = Font.system(.subheadline)
+        static let footnote = Font.system(.footnote)
+        static let caption = Font.system(.caption)
+        static let caption2 = Font.system(.caption2)
+        static let monospacedAmount = Font.system(.title2, design: .rounded).weight(.bold)
+        static let monospacedAmountLarge = Font.system(.largeTitle, design: .rounded).weight(.bold)
+
+        // Legacy aliases kept for existing call sites.
+        static let largeTitle = display
+        static let title = title2
     }
 }
