@@ -17,7 +17,7 @@ struct DashboardView: View {
     @State private var showingAddTask = false
     @State private var showingAddTransaction = false
     @State private var showingAddJournal = false
-    @State private var showingWardrobe = false
+    @State private var showingCalendar = false
 
     var body: some View {
         NavigationStack {
@@ -54,8 +54,8 @@ struct DashboardView: View {
                     viewModel?.load()
                 }
             }
-            .sheet(isPresented: $showingWardrobe) {
-                WardrobeView()
+            .sheet(isPresented: $showingCalendar) {
+                NavigationStack { CalendarView() }
             }
             .onAppear {
                 if viewModel == nil {
@@ -92,13 +92,13 @@ struct DashboardView: View {
 
     private var heroHeader: some View {
         HStack(spacing: AppTheme.Spacing.md) {
-            MascotAvatarView(size: 52)
-            VStack(alignment: .leading, spacing: 2) {
+            MascotAvatarView(size: 60)
+            VStack(alignment: .leading, spacing: 4) {
                 Text("TidyUp")
-                    .font(AppTheme.Typography.title1)
+                    .font(AppTheme.Typography.display)
                     .foregroundStyle(.white)
                 Text(Date.now.formatted(.full))
-                    .font(AppTheme.Typography.footnote)
+                    .font(AppTheme.Typography.subheadline)
                     .foregroundStyle(.white.opacity(0.75))
             }
             Spacer()
@@ -112,8 +112,8 @@ struct DashboardView: View {
             }
         }
         .padding(.horizontal, AppTheme.Spacing.lg)
-        .padding(.top, 56)
-        .padding(.bottom, AppTheme.Spacing.lg)
+        .padding(.top, 76)
+        .padding(.bottom, AppTheme.Spacing.xl)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppTheme.Colors.walletGradient(for: 0))
         .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: AppTheme.Radius.xl, bottomTrailingRadius: AppTheme.Radius.xl))
@@ -127,7 +127,7 @@ struct DashboardView: View {
             quickActionButton(icon: "checklist", label: "Task", color: AppTheme.Colors.accent) { showingAddTask = true }
             quickActionButton(icon: "banknote.fill", label: "Expense", color: AppTheme.Colors.success) { showingAddTransaction = true }
             quickActionButton(icon: "book.closed.fill", label: "Journal", color: AppTheme.Colors.reimburse) { showingAddJournal = true }
-            quickActionButton(icon: "tshirt.fill", label: "Wardrobe", color: AppTheme.Colors.warning) { showingWardrobe = true }
+            quickActionButton(icon: "calendar", label: "Calendar", color: AppTheme.Colors.warning) { showingCalendar = true }
         }
         .padding(.horizontal)
     }
