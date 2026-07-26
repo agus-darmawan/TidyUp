@@ -63,6 +63,8 @@ struct PASectionHeader: View {
     }
 }
 
+/// Friendlier empty state: icon sits inside a soft tinted circle instead
+/// of floating bare, and gently scales/fades in on appear.
 struct PAEmptyState: View {
     let systemImage: String
     let title: String
@@ -70,18 +72,24 @@ struct PAEmptyState: View {
     var actionTitle: String? = nil
     var action: (() -> Void)? = nil
 
+    @State private var appeared = false
+
     var body: some View {
         VStack(spacing: AppTheme.Spacing.md) {
             Image(systemName: systemImage)
-                .font(.system(size: 40))
-                .foregroundStyle(AppTheme.Colors.tertiaryText)
+                .font(.system(size: 32))
+                .foregroundStyle(AppTheme.Colors.accent)
+                .frame(width: 84, height: 84)
+                .background(AppTheme.Colors.accent.opacity(0.12))
+                .clipShape(Circle())
+
             Text(title)
                 .font(AppTheme.Typography.headline)
-                .foregroundStyle(AppTheme.Colors.secondaryText)
+                .foregroundStyle(AppTheme.Colors.primaryText)
             if let message {
                 Text(message)
                     .font(AppTheme.Typography.subheadline)
-                    .foregroundStyle(AppTheme.Colors.tertiaryText)
+                    .foregroundStyle(AppTheme.Colors.secondaryText)
                     .multilineTextAlignment(.center)
             }
             if let actionTitle, let action {
@@ -93,6 +101,11 @@ struct PAEmptyState: View {
         }
         .padding(AppTheme.Spacing.xxl)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .scaleEffect(appeared ? 1 : 0.9)
+        .opacity(appeared ? 1 : 0)
+        .onAppear {
+            withAnimation(AppTheme.Motion.bouncy) { appeared = true }
+        }
     }
 }
 
@@ -110,8 +123,10 @@ struct PAPrimaryButton: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, AppTheme.Spacing.md)
         }
-        .buttonStyle(.borderedProminent)
+        .buttonStyle(PressableButtonStyle())
         .tint(AppTheme.Colors.accent)
+        .background(AppTheme.Colors.accent)
+        .foregroundStyle(AppTheme.Colors.contrastingText(on: AppTheme.Colors.accent))
         .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
     }
 }
@@ -125,5 +140,17 @@ struct PACurrencyText: View {
         Text(CurrencyFormatter.format(amount, signed: signed))
             .font(AppTheme.Typography.monospacedAmount)
             .foregroundStyle(color ?? (amount < 0 ? AppTheme.Colors.expense : AppTheme.Colors.primaryText))
+            .contentTransition(.numericText())
+    }
+}
+
+/// Subtle scale-down-on-press feedback for tappable cards and buttons —
+/// the "modern app" tactile touch, used across Tasks/Wardrobe/Finance rows.
+struct PressableButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .opacity(configuration.isPressed ? 0.9 : 1)
+            .animation(AppTheme.Motion.quick, value: configuration.isPressed)
     }
 }
