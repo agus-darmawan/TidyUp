@@ -17,6 +17,7 @@ struct DashboardView: View {
     @State private var showingAddTask = false
     @State private var showingAddTransaction = false
     @State private var showingAddJournal = false
+    @State private var showingWardrobe = false
 
     var body: some View {
         NavigationStack {
@@ -31,6 +32,7 @@ struct DashboardView: View {
             .animation(AppTheme.Motion.snappy, value: viewModel == nil)
             .background(AppTheme.Colors.background.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
+            .ignoresSafeArea(edges: .top)
             .sheet(isPresented: $showingAddTask) {
                 AddEditTaskView(task: nil) { task in
                     container.taskRepository.save(task)
@@ -51,6 +53,9 @@ struct DashboardView: View {
                     container.journalRepository.save(entry)
                     viewModel?.load()
                 }
+            }
+            .sheet(isPresented: $showingWardrobe) {
+                WardrobeView()
             }
             .onAppear {
                 if viewModel == nil {
@@ -122,7 +127,7 @@ struct DashboardView: View {
             quickActionButton(icon: "checklist", label: "Task", color: AppTheme.Colors.accent) { showingAddTask = true }
             quickActionButton(icon: "banknote.fill", label: "Expense", color: AppTheme.Colors.success) { showingAddTransaction = true }
             quickActionButton(icon: "book.closed.fill", label: "Journal", color: AppTheme.Colors.reimburse) { showingAddJournal = true }
-            quickActionButton(icon: "tshirt.fill", label: "Wardrobe", color: AppTheme.Colors.warning) { tabRouter.go(to: .more) }
+            quickActionButton(icon: "tshirt.fill", label: "Wardrobe", color: AppTheme.Colors.warning) { showingWardrobe = true }
         }
         .padding(.horizontal)
     }
@@ -172,8 +177,8 @@ struct DashboardView: View {
                     tint: .neutral
                 )
             }
-            .padding(.horizontal)
         }
+        .padding(.horizontal)
     }
 
     private func tasksSection(_ viewModel: DashboardViewModel) -> some View {
