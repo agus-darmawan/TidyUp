@@ -1,5 +1,7 @@
 # TidyUp
 
+[![iOS Build & Test](https://github.com/agus-darmawan/TidyUp/actions/workflows/ios-tests.yml/badge.svg)](https://github.com/agus-darmawan/TidyUp/actions/workflows/ios-tests.yml)
+
 Offline personal assistant app — Tasks, Money (with Reimbursement),
 Wardrobe, Journal, Calendar. No backend, no login. Swift 6, SwiftUI,
 SwiftData, MVVM.
