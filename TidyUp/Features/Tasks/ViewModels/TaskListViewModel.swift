@@ -14,7 +14,7 @@ enum TaskFilter: String, CaseIterable, Identifiable {
         case .all: "All"
         case .today: "Today"
         case .overdue: "Overdue"
-        case .highPriority: "High Priority"
+        case .highPriority: "Urgent"
         case .done: "Done"
         }
     }
