@@ -23,7 +23,13 @@ struct TaskProgressHeader: View {
                     .stroke(AppTheme.Colors.accent.opacity(0.15), lineWidth: 8)
                 Circle()
                     .trim(from: 0, to: progress)
-                    .stroke(AppTheme.Colors.accent, style: StrokeStyle(lineWidth: 8, lineCap: .round))
+                    .stroke(
+                        AngularGradient(
+                            colors: [AppTheme.Colors.brandMint, AppTheme.Colors.brandMint.opacity(0.5), AppTheme.Colors.brandMint],
+                            center: .center
+                        ),
+                        style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                    )
                     .rotationEffect(.degrees(-90))
                     .animation(AppTheme.Motion.snappy, value: progress)
                 Text("\(Int(progress * 100))%")
