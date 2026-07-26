@@ -14,6 +14,7 @@ struct FinanceView: View {
     @State private var viewModel: FinanceViewModel?
     @State private var showingAddTransaction = false
     @State private var showingAddAccount = false
+    @State private var showingExport = false
 
     var body: some View {
         NavigationStack {
@@ -32,6 +33,7 @@ struct FinanceView: View {
                         Button { showingAddTransaction = true } label: { Label("New Transaction", systemImage: "plus") }
                         Button { showingAddAccount = true } label: { Label("New Account", systemImage: "creditcard.and.123") }
                         NavigationLink { ReimbursementView() } label: { Label("Reimbursements", systemImage: "arrow.triangle.2.circlepath") }
+                        Button { showingExport = true } label: { Label("Export Report", systemImage: "square.and.arrow.up") }
                     } label: {
                         Image(systemName: "plus.circle.fill")
                             .font(.system(size: 20))
@@ -50,6 +52,9 @@ struct FinanceView: View {
                     container.accountRepository.save(account)
                     viewModel?.load()
                 }
+            }
+            .sheet(isPresented: $showingExport) {
+                ExportTransactionsView()
             }
             .onAppear {
                 if viewModel == nil {
@@ -161,22 +166,22 @@ struct FinanceView: View {
     private func statPill(title: String, amount: Decimal, color: Color, icon: String) -> some View {
         HStack(spacing: AppTheme.Spacing.xs) {
             Image(systemName: icon)
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(color)
-                .frame(width: 28, height: 28)
+                .frame(width: 30, height: 30)
                 .background(color.opacity(0.12))
                 .clipShape(Circle())
             VStack(alignment: .leading, spacing: 1) {
                 Text(title.uppercased())
-                    .font(.system(size: 9, weight: .semibold))
+                    .font(.system(size: 10, weight: .semibold))
                     .tracking(0.3)
                     .foregroundStyle(AppTheme.Colors.secondaryText)
                 Text(CurrencyFormatter.format(amount))
-                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .font(.system(size: 15, weight: .bold, design: .rounded))
                     .foregroundStyle(color)
                     .contentTransition(.numericText())
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                    .minimumScaleFactor(0.6)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
