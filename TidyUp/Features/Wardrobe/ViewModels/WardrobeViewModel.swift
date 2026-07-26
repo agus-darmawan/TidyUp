@@ -31,6 +31,22 @@ final class WardrobeViewModel {
         return items.filter { $0.category == selectedCategory }
     }
 
+    /// Items grouped by category — each group only appears if it has items.
+    var groupedByCategory: [(category: ClothingCategory, items: [ClothingItem])] {
+        ClothingCategory.allCases.compactMap { category in
+            let matching = items.filter { $0.category == category }
+            return matching.isEmpty ? nil : (category, matching)
+        }
+    }
+
+    /// Items grouped by laundry status (In Laundry first, then Dirty, then Clean).
+    var groupedByStatus: [(status: LaundryStatus, items: [ClothingItem])] {
+        [LaundryStatus.washing, .dirty, .clean].compactMap { status in
+            let matching = items.filter { $0.laundryStatus == status }
+            return matching.isEmpty ? nil : (status, matching)
+        }
+    }
+
     /// Jackets/linens that are approaching or past the end of their wear cycle.
     var itemsNeedingWash: [ClothingItem] {
         items.filter { item in

@@ -12,12 +12,25 @@ private enum WardrobeLayout {
     case grid, list
 }
 
+private enum WardrobeGrouping: String, CaseIterable, Identifiable {
+    case none, category, status
+    var id: String { rawValue }
+    var label: String {
+        switch self {
+        case .none: "None"
+        case .category: "Category"
+        case .status: "Status"
+        }
+    }
+}
+
 struct WardrobeView: View {
     @Environment(DependencyContainer.self) private var container
     @State private var viewModel: WardrobeViewModel?
     @State private var cart = OutfitCartViewModel()
     @State private var showingAdd = false
     @State private var layout: WardrobeLayout = .grid
+    @State private var grouping: WardrobeGrouping = .none
 
     private let gridColumns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
 
@@ -33,6 +46,17 @@ struct WardrobeView: View {
             .navigationTitle("Wardrobe")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Menu {
+                        Picker("Group By", selection: $grouping) {
+                            ForEach(WardrobeGrouping.allCases) { option in
+                                Text(option.label).tag(option)
+                            }
+                        }
+                    } label: {
+                        Label("Group", systemImage: "rectangle.grid.1x2")
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { showingAdd = true } label: { Image(systemName: "plus.circle.fill") }
                 }
@@ -66,7 +90,10 @@ struct WardrobeView: View {
                 .padding(.horizontal)
 
             HStack(spacing: AppTheme.Spacing.sm) {
-                CategoryFilterBar(selected: $viewModel.selectedCategory)
+                if grouping != .category {
+                    CategoryFilterBar(selected: $viewModel.selectedCategory)
+                }
+                Spacer(minLength: 0)
                 Button {
                     withAnimation(AppTheme.Motion.snappy) { layout = layout == .grid ? .list : .grid }
                 } label: {
@@ -90,52 +117,31 @@ struct WardrobeView: View {
                     .padding(.horizontal)
             }
 
-            if viewModel.filteredItems.isEmpty {
+            if (grouping == .none ? viewModel.filteredItems : viewModel.items).isEmpty {
                 PAEmptyState(systemImage: "tshirt", title: "No clothing items", message: "Add items to start tracking your wardrobe.")
             } else {
                 ScrollView {
-                    Group {
-                        switch layout {
-                        case .grid:
-                            LazyVGrid(columns: gridColumns, spacing: AppTheme.Spacing.md) {
-                                ForEach(viewModel.filteredItems) { item in
-                                    NavigationLink {
-                                        ClothingDetailView(item: item)
-                                    } label: {
-                                        ClothingGridCell(
-                                            item: item,
-                                            thumbnail: item.photoFilename.flatMap { viewModel.loadImage(filename: $0) },
-                                            isSelected: cart.isSelected(item),
-                                            onToggleSelect: { cart.toggle(item) }
-                                        )
-                                    }
-                                    .buttonStyle(PressableButtonStyle())
-                                }
-                            }
-                        case .list:
-                            LazyVStack(spacing: AppTheme.Spacing.sm) {
-                                ForEach(viewModel.filteredItems) { item in
-                                    NavigationLink {
-                                        ClothingDetailView(item: item)
-                                    } label: {
-                                        ClothingRowView(
-                                            item: item,
-                                            thumbnail: item.photoFilename.flatMap { viewModel.loadImage(filename: $0) },
-                                            isSelected: cart.isSelected(item),
-                                            onToggleSelect: { cart.toggle(item) },
-                                            onStartWash: { viewModel.startWash(item) },
-                                            onWashed: { viewModel.markWashed(item) },
-                                            onDelete: { viewModel.delete(item) }
-                                        )
-                                    }
-                                    .buttonStyle(PressableButtonStyle())
-                                }
+                    switch grouping {
+                    case .none:
+                        itemsView(viewModel.filteredItems, viewModel)
+                            .padding(.horizontal)
+                    case .category:
+                        VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
+                            ForEach(viewModel.groupedByCategory, id: \.category) { group in
+                                groupSection(title: group.category.label, items: group.items, viewModel: viewModel)
                             }
                         }
+                        .padding(.horizontal)
+                    case .status:
+                        VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
+                            ForEach(viewModel.groupedByStatus, id: \.status) { group in
+                                groupSection(title: group.status.label, items: group.items, viewModel: viewModel)
+                            }
+                        }
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
-                    .padding(.bottom, cart.isEmpty ? AppTheme.Spacing.xxl : 80)
                 }
+                .padding(.bottom, cart.isEmpty ? AppTheme.Spacing.xxl : 80)
             }
         }
         .padding(.top, AppTheme.Spacing.sm)
@@ -144,6 +150,58 @@ struct WardrobeView: View {
             if !cart.isEmpty {
                 confirmBar(viewModel)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+    }
+
+    private func groupSection(title: String, items: [ClothingItem], viewModel: WardrobeViewModel) -> some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+            Text("\(title.uppercased()) (\(items.count))")
+                .font(.system(size: 11, weight: .semibold))
+                .tracking(0.4)
+                .foregroundStyle(AppTheme.Colors.secondaryText)
+            itemsView(items, viewModel)
+        }
+        .padding(.bottom, AppTheme.Spacing.sm)
+    }
+
+    @ViewBuilder
+    private func itemsView(_ items: [ClothingItem], _ viewModel: WardrobeViewModel) -> some View {
+        switch layout {
+        case .grid:
+            LazyVGrid(columns: gridColumns, spacing: AppTheme.Spacing.md) {
+                ForEach(items) { item in
+                    NavigationLink {
+                        ClothingDetailView(item: item)
+                    } label: {
+                        ClothingGridCell(
+                            item: item,
+                            thumbnail: item.photoFilename.flatMap { viewModel.loadImage(filename: $0) },
+                            isSelected: cart.isSelected(item),
+                            onToggleSelect: { cart.toggle(item) }
+                        )
+                    }
+                    .buttonStyle(PressableButtonStyle())
+                }
+            }
+        case .list:
+            LazyVStack(spacing: AppTheme.Spacing.sm) {
+                ForEach(items) { item in
+                    NavigationLink {
+                        ClothingDetailView(item: item)
+                    } label: {
+                        ClothingRowView(
+                            item: item,
+                            thumbnail: item.photoFilename.flatMap { viewModel.loadImage(filename: $0) },
+                            isSelected: cart.isSelected(item),
+                            onToggleSelect: { cart.toggle(item) },
+                            onStartWash: { viewModel.startWash(item) },
+                            onWashed: { viewModel.markWashed(item) },
+                            onDelete: { viewModel.delete(item) }
+                        )
+                    }
+                    .buttonStyle(PressableButtonStyle())
+                }
             }
         }
     }
