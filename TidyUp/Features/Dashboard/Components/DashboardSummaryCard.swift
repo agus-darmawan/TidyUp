@@ -13,7 +13,7 @@ enum DashboardCardTint {
         case .cream: AppTheme.Colors.brandYellow.opacity(0.35)
         case .mint: AppTheme.Colors.brandMint
         case .coral: AppTheme.Colors.brandCoral
-        case .neutral: AppTheme.Colors.surface
+        case .neutral: AppTheme.Colors.brandNavy   // bold "hero" card — always visible, never blends into a white page
         }
     }
 
@@ -21,7 +21,7 @@ enum DashboardCardTint {
         switch self {
         case .cream: AppTheme.Colors.brandNavy
         case .mint, .coral: AppTheme.Colors.contrastingText(on: background)
-        case .neutral: AppTheme.Colors.primaryText
+        case .neutral: .white
         }
     }
 }

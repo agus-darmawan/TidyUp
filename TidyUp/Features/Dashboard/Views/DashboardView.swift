@@ -56,25 +56,33 @@ struct DashboardView: View {
     }
 
     private var header: some View {
-        HStack(spacing: AppTheme.Spacing.md) {
-            MascotAvatarView(size: 52)
-            VStack(alignment: .leading, spacing: 2) {
-                Text("TidyUp")
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundStyle(AppTheme.Colors.primaryText)
-                Text("Your day, tidied up.")
-                    .font(.system(size: 13))
-                    .foregroundStyle(AppTheme.Colors.secondaryText)
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+            HStack(spacing: AppTheme.Spacing.md) {
+                MascotAvatarView(size: 52)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("TidyUp")
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundStyle(AppTheme.Colors.primaryText)
+                    Text("Your day, tidied up.")
+                        .font(.system(size: 13))
+                        .foregroundStyle(AppTheme.Colors.secondaryText)
+                }
+                Spacer()
+                Button {} label: {
+                    Image(systemName: "bell.fill")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(AppTheme.Colors.accent)
+                        .frame(width: 40, height: 40)
+                        .background(AppTheme.Colors.accent.opacity(0.12))
+                        .clipShape(Circle())
+                }
             }
-            Spacer()
-            Button {} label: {
-                Image(systemName: "bell.fill")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(AppTheme.Colors.accent)
-                    .frame(width: 40, height: 40)
-                    .background(AppTheme.Colors.accent.opacity(0.12))
-                    .clipShape(Circle())
-            }
+
+            WeekStripView()
+                .padding(.vertical, AppTheme.Spacing.sm)
+                .padding(.horizontal, AppTheme.Spacing.xs)
+                .background(AppTheme.Colors.surface)
+                .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
         }
         .padding(.bottom, AppTheme.Spacing.xs)
     }

@@ -34,9 +34,10 @@ extension Date {
         case .monthYear: formatter.dateFormat = "MMMM yyyy"
         case .dayMonth: formatter.dateFormat = "d MMM"
         case .time: formatter.timeStyle = .short
+        case .weekdayNarrow: formatter.dateFormat = "EEEEE"
         }
         return formatter.string(from: self)
     }
 
-    enum DateFormatStyle { case short, medium, monthYear, dayMonth, time }
+    enum DateFormatStyle { case short, medium, monthYear, dayMonth, time, weekdayNarrow }
 }
