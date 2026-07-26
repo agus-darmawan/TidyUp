@@ -54,6 +54,7 @@ struct DashboardSummaryCard: View {
                 .foregroundStyle(tint.foreground)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
+                .contentTransition(.numericText())
         }
         .padding(AppTheme.Spacing.md)
         .frame(maxWidth: .infinity, minHeight: 100, alignment: .leading)

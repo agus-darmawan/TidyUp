@@ -18,10 +18,12 @@ struct DashboardView: View {
             Group {
                 if let viewModel {
                     content(viewModel)
+                        .transition(.opacity)
                 } else {
                     ProgressView()
                 }
             }
+            .animation(AppTheme.Motion.snappy, value: viewModel == nil)
             .background(AppTheme.Colors.background.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
             .onAppear {

@@ -96,7 +96,7 @@ struct FinanceView: View {
                         NavigationLink { AccountDetailView(account: account) } label: {
                             AccountCard(account: account)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(PressableButtonStyle())
                         .padding(.horizontal)
                     }
                 }
