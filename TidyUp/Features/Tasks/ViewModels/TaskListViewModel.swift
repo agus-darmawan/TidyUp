@@ -27,7 +27,6 @@ final class TaskListViewModel {
 
     var tasks: [TaskItem] = []
     var filter: TaskFilter = .all
-    var searchText: String = ""
 
     init(repository: TaskRepositoryProtocol, notificationService: NotificationService) {
         self.repository = repository
@@ -46,12 +45,6 @@ final class TaskListViewModel {
         case .overdue: result = result.filter(\.isOverdue)
         case .highPriority: result = result.filter { $0.priority == .high }
         case .done: result = result.filter(\.isDone)
-        }
-        if !searchText.isEmpty {
-            result = result.filter {
-                $0.title.localizedCaseInsensitiveContains(searchText) ||
-                $0.tags.contains { $0.localizedCaseInsensitiveContains(searchText) }
-            }
         }
         return result.sorted { lhs, rhs in
             if lhs.isDone != rhs.isDone { return !lhs.isDone && rhs.isDone }

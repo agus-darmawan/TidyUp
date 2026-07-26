@@ -47,6 +47,9 @@ struct TaskDetailView: View {
                         subtask: subtask,
                         onToggle: {
                             subtask.isDone.toggle()
+                            // If every subtask is now done, mark the whole task done too;
+                            // if any subtask becomes un-done, un-complete the parent as well.
+                            currentTask.isDone = !currentTask.subtasks.isEmpty && currentTask.subtasks.allSatisfy(\.isDone)
                             container.taskRepository.save(currentTask)
                         },
                         onDelete: {
