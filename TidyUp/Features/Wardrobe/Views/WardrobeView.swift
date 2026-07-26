@@ -4,7 +4,6 @@
 //
 //  Grid view by default (toggle to list anytime). Main feature is
 //  logging wear time via the outfit cart — tap items in, confirm once.
-//  Gradient hero header matches Home/Money's visual language.
 //
 
 import SwiftUI
@@ -31,8 +30,13 @@ struct WardrobeView: View {
                     ProgressView()
                 }
             }
-            .toolbar(.hidden, for: .navigationBar)
-            .ignoresSafeArea(edges: .top)
+            .navigationTitle("Wardrobe")
+            .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { showingAdd = true } label: { Image(systemName: "plus.circle.fill") }
+                }
+            }
             .sheet(isPresented: $showingAdd) {
                 if let viewModel {
                     AddClothingItemView(suggestedCode: viewModel.nextItemCode()) { newItem in
@@ -58,8 +62,6 @@ struct WardrobeView: View {
     private func content(_ viewModel: WardrobeViewModel) -> some View {
         @Bindable var viewModel = viewModel
         VStack(spacing: AppTheme.Spacing.sm) {
-            heroHeader(viewModel)
-
             statStrip(viewModel)
                 .padding(.horizontal)
 
@@ -136,6 +138,7 @@ struct WardrobeView: View {
                 }
             }
         }
+        .padding(.top, AppTheme.Spacing.sm)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .overlay(alignment: .bottom) {
             if !cart.isEmpty {
@@ -143,34 +146,6 @@ struct WardrobeView: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-    }
-
-    private func heroHeader(_ viewModel: WardrobeViewModel) -> some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Wardrobe")
-                    .font(AppTheme.Typography.title1)
-                    .foregroundStyle(.white)
-                Text("\(viewModel.items.count) items in your closet")
-                    .font(AppTheme.Typography.footnote)
-                    .foregroundStyle(.white.opacity(0.75))
-            }
-            Spacer()
-            Button { showingAdd = true } label: {
-                Image(systemName: "plus")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 40, height: 40)
-                    .background(.white.opacity(0.18))
-                    .clipShape(Circle())
-            }
-        }
-        .padding(.horizontal, AppTheme.Spacing.lg)
-        .padding(.top, 56)
-        .padding(.bottom, AppTheme.Spacing.lg)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppTheme.Colors.walletGradient(for: 2))
-        .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: AppTheme.Radius.xl, bottomTrailingRadius: AppTheme.Radius.xl))
     }
 
     private func confirmBar(_ viewModel: WardrobeViewModel) -> some View {
@@ -202,20 +177,20 @@ struct WardrobeView: View {
     }
 
     private func wardrobeStat(title: String, value: String, color: Color) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: 3) {
             Text(title.uppercased())
-                .font(.system(size: 9, weight: .semibold))
+                .font(.system(size: 10, weight: .semibold))
                 .tracking(0.3)
                 .foregroundStyle(AppTheme.Colors.secondaryText)
             Text(value)
-                .font(.system(size: 15, weight: .bold, design: .rounded))
+                .font(.system(size: 18, weight: .bold, design: .rounded))
                 .foregroundStyle(color)
                 .contentTransition(.numericText())
                 .lineLimit(1)
-                .minimumScaleFactor(0.7)
+                .minimumScaleFactor(0.6)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(AppTheme.Spacing.sm)
+        .padding(AppTheme.Spacing.md)
         .background(AppTheme.Colors.surface)
         .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
     }

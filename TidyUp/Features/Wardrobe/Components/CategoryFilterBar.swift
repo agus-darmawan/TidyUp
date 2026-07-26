@@ -27,7 +27,7 @@ struct CategoryFilterBar: View {
                 .padding(.vertical, AppTheme.Spacing.xs)
                 .background(isSelected ? AppTheme.Colors.accent : AppTheme.Colors.surface)
                 .foregroundStyle(isSelected ? AppTheme.Colors.contrastingText(on: AppTheme.Colors.accent) : AppTheme.Colors.primaryText)
-                .clipShape(Capsule())
+                .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.sm, style: .continuous))
         }
         .buttonStyle(.plain)
     }

@@ -26,9 +26,6 @@ struct ClothingRowView: View {
                 Text(item.name)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(AppTheme.Colors.primaryText)
-                Text(item.itemCode)
-                    .font(.system(size: 11))
-                    .foregroundStyle(AppTheme.Colors.secondaryText)
                 PATagChip(text: statusText, color: statusColor)
             }
 

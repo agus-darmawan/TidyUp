@@ -54,9 +54,6 @@ struct ClothingGridCell: View {
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(AppTheme.Colors.primaryText)
                 .lineLimit(1)
-            Text(item.itemCode)
-                .font(.system(size: 10))
-                .foregroundStyle(AppTheme.Colors.secondaryText)
 
             PATagChip(text: statusText, color: statusColor)
         }
