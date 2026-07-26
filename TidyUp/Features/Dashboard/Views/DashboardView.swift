@@ -13,6 +13,7 @@ import SwiftUI
 struct DashboardView: View {
     @Environment(DependencyContainer.self) private var container
     @Environment(TabRouter.self) private var tabRouter
+    @Environment(\.colorScheme) private var colorScheme
     @State private var viewModel: DashboardViewModel?
     @State private var showingAddTask = false
     @State private var showingAddTransaction = false
@@ -116,6 +117,7 @@ struct DashboardView: View {
         .padding(.bottom, AppTheme.Spacing.xl)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppTheme.Colors.walletGradient(for: 0))
+        .overlay(colorScheme == .dark ? Color.black.opacity(0.18) : Color.clear)
         .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: AppTheme.Radius.xl, bottomTrailingRadius: AppTheme.Radius.xl))
         .ignoresSafeArea(edges: .top)
     }

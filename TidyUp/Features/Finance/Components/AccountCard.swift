@@ -12,6 +12,7 @@ import SwiftUI
 struct AccountCard: View {
     let account: Account
     var gradientIndex: Int = 0
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
@@ -55,6 +56,7 @@ struct AccountCard: View {
         .padding(AppTheme.Spacing.lg)
         .frame(width: 260, height: 160, alignment: .leading)
         .background(AppTheme.Colors.walletGradient(for: gradientIndex))
+        .overlay(colorScheme == .dark ? Color.black.opacity(0.18) : Color.clear)
         .overlay(
             // Faint diagonal sheen for a bit of card-material realism.
             LinearGradient(colors: [.white.opacity(0.12), .clear], startPoint: .topLeading, endPoint: .center)
