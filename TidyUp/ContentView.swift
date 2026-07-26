@@ -10,10 +10,13 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var selectedTab = 0
+    @State private var tabRouter = TabRouter()
 
     var body: some View {
-        TabView(selection: $selectedTab) {
+        TabView(selection: Binding(
+            get: { tabRouter.selectedTab },
+            set: { tabRouter.selectedTab = $0 }
+        )) {
             DashboardView()
                 .tabItem { Label("Home", systemImage: "house.fill") }
                 .tag(0)
@@ -31,7 +34,8 @@ struct ContentView: View {
                 .tag(3)
         }
         .tint(AppTheme.Colors.accent)
-        .animation(AppTheme.Motion.snappy, value: selectedTab)
+        .animation(AppTheme.Motion.snappy, value: tabRouter.selectedTab)
+        .environment(tabRouter)
     }
 }
 

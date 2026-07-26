@@ -38,14 +38,15 @@ struct WeekStripView: View {
         return VStack(spacing: 4) {
             Text(weekdaySymbol)
                 .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(AppTheme.Colors.secondaryText)
+                .foregroundStyle(.white.opacity(0.65))
             Text("\(dayNumber)")
                 .font(.system(size: 13, weight: isToday ? .bold : .medium))
-                .foregroundStyle(isSelected ? .white : AppTheme.Colors.primaryText)
+                .foregroundStyle(.white)
                 .frame(width: 28, height: 28)
                 .background(
-                    Circle().fill(isSelected ? AppTheme.Colors.accent : (isToday ? AppTheme.Colors.accent.opacity(0.15) : .clear))
+                    Circle().fill(isSelected ? Color.white.opacity(0.9) : (isToday ? .white.opacity(0.25) : .clear))
                 )
+                .foregroundStyle(isSelected ? AppTheme.Colors.brandNavy : .white)
         }
         .frame(maxWidth: .infinity)
         .contentShape(Rectangle())
