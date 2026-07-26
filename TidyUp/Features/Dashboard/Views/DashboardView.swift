@@ -86,39 +86,33 @@ struct DashboardView: View {
     // MARK: - Hero header
 
     private var heroHeader: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
-            HStack(spacing: AppTheme.Spacing.md) {
-                MascotAvatarView(size: 52)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("TidyUp")
-                        .font(AppTheme.Typography.title1)
-                        .foregroundStyle(.white)
-                    Text("Your day, tidied up.")
-                        .font(AppTheme.Typography.footnote)
-                        .foregroundStyle(.white.opacity(0.75))
-                }
-                Spacer()
-                Button {} label: {
-                    Image(systemName: "bell.fill")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .frame(width: 40, height: 40)
-                        .background(.white.opacity(0.18))
-                        .clipShape(Circle())
-                }
+        HStack(spacing: AppTheme.Spacing.md) {
+            MascotAvatarView(size: 52)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("TidyUp")
+                    .font(AppTheme.Typography.title1)
+                    .foregroundStyle(.white)
+                Text(Date.now.formatted(.full))
+                    .font(AppTheme.Typography.footnote)
+                    .foregroundStyle(.white.opacity(0.75))
             }
-
-            WeekStripView()
-                .padding(.vertical, AppTheme.Spacing.sm)
-                .padding(.horizontal, AppTheme.Spacing.xs)
-                .background(.white.opacity(0.12))
-                .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
+            Spacer()
+            Button {} label: {
+                Image(systemName: "bell.fill")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 40, height: 40)
+                    .background(.white.opacity(0.18))
+                    .clipShape(Circle())
+            }
         }
-        .padding(AppTheme.Spacing.lg)
-        .padding(.top, AppTheme.Spacing.sm)
+        .padding(.horizontal, AppTheme.Spacing.lg)
+        .padding(.top, 56)
+        .padding(.bottom, AppTheme.Spacing.lg)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppTheme.Colors.walletGradient(for: 0))
         .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: AppTheme.Radius.xl, bottomTrailingRadius: AppTheme.Radius.xl))
-        .shadow(color: Color.black.opacity(0.12), radius: 16, x: 0, y: 8)
+        .ignoresSafeArea(edges: .top)
     }
 
     // MARK: - Quick actions
