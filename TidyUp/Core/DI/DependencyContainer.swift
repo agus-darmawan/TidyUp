@@ -20,6 +20,7 @@ final class DependencyContainer {
     let accountRepository: AccountRepository
     let transactionRepository: TransactionRepository
     let journalRepository: JournalRepository
+    let scheduleEventRepository: ScheduleEventRepository
 
     let imageStorageService: ImageStorageService
     let notificationService: NotificationService
@@ -36,9 +37,15 @@ final class DependencyContainer {
         self.accountRepository = AccountRepository(context: modelContext)
         self.transactionRepository = TransactionRepository(context: modelContext, accountRepository: accountRepository)
         self.journalRepository = JournalRepository(context: modelContext)
+        self.scheduleEventRepository = ScheduleEventRepository(context: modelContext)
 
         self.pdfExportService = PDFExportService(imageStorageService: imageStorageService)
     }
+
+    /// Fixed, stable ID for the daily journal reminder — scheduling with
+    /// the same ID every launch replaces the old request instead of
+    /// stacking duplicates.
+    static let journalReminderID = UUID(uuidString: "5A6E7B90-0000-4000-8000-000000000001")!
 
     func seedDefaultsIfNeeded() {
         transactionRepository.seedDefaultCategoriesIfNeeded()
@@ -50,7 +57,8 @@ final class DependencyContainer {
             TaskItem.self, SubTask.self,
             ClothingItem.self,
             Account.self, Transaction.self, TransactionCategory.self, Debt.self, Installment.self,
-            JournalEntry.self
+            JournalEntry.self,
+            ScheduleEvent.self
         ])
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try! ModelContainer(for: schema, configurations: [config])

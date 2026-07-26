@@ -18,7 +18,8 @@ struct TidyUpApp: App {
             TaskItem.self, SubTask.self,
             ClothingItem.self,
             Account.self, Transaction.self, TransactionCategory.self, Debt.self, Installment.self,
-            JournalEntry.self
+            JournalEntry.self,
+            ScheduleEvent.self
         ])
 
         let configuration = ModelConfiguration("TidyUpStore", schema: schema, isStoredInMemoryOnly: false)
@@ -40,6 +41,12 @@ struct TidyUpApp: App {
                 .task {
                     await container.notificationService.requestAuthorizationIfNeeded()
                     container.seedDefaultsIfNeeded()
+                    container.notificationService.scheduleDailyReminder(
+                        id: DependencyContainer.journalReminderID,
+                        title: "Time to reflect 📝",
+                        body: "Don't forget to write in your journal before bed.",
+                        hour: 23, minute: 0
+                    )
                 }
         }
     }

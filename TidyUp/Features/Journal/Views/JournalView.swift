@@ -17,16 +17,24 @@ struct JournalView: View {
                     PAEmptyState(systemImage: "book.closed", title: "No journal entries yet", message: "Reflect on your day.", actionTitle: "New Entry") {
                         showingAdd = true
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 } else {
-                    List {
-                        ForEach(viewModel.entries) { entry in
-                            JournalCardView(entry: entry).listRowSeparator(.hidden)
+                    ScrollView {
+                        VStack(spacing: AppTheme.Spacing.md) {
+                            ForEach(viewModel.entries) { entry in
+                                JournalCardView(
+                                    entry: entry,
+                                    thumbnail: entry.photoFilenames.first.flatMap { container.imageStorageService.loadImage(filename: $0) }
+                                )
+                                .contextMenu {
+                                    Button(role: .destructive) { viewModel.delete(entry) } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                }
+                            }
                         }
-                        .onDelete { indexSet in
-                            for index in indexSet { viewModel.delete(viewModel.entries[index]) }
-                        }
+                        .padding()
                     }
-                    .listStyle(.plain)
                 }
             } else {
                 ProgressView()
@@ -41,6 +49,7 @@ struct JournalView: View {
         .sheet(isPresented: $showingAdd) {
             AddEditJournalView(entry: nil) { entry in viewModel?.save(entry) }
         }
+        .background(AppTheme.Colors.background.ignoresSafeArea())
         .onAppear {
             if viewModel == nil { viewModel = JournalViewModel(repository: container.journalRepository) }
             viewModel?.load()

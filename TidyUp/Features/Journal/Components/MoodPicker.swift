@@ -32,17 +32,48 @@ struct MoodPicker: View {
 
 struct JournalCardView: View {
     let entry: JournalEntry
+    var thumbnail: UIImage? = nil
 
     var body: some View {
         PACard {
-            HStack {
-                Text(entry.mood.emoji).font(.title2)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(entry.date.formatted(.medium)).font(.system(size: 11)).foregroundStyle(AppTheme.Colors.secondaryText)
+            HStack(alignment: .top, spacing: AppTheme.Spacing.md) {
+                Text(entry.mood.emoji)
+                    .font(.system(size: 26))
+                    .frame(width: 48, height: 48)
+                    .background(AppTheme.Colors.forMood(entry.mood).opacity(0.15))
+                    .clipShape(Circle())
+
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(entry.date.formatted(.medium))
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(AppTheme.Colors.primaryText)
+                        Spacer()
+                        Text(entry.mood.label)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(AppTheme.Colors.forMood(entry.mood))
+                    }
                     Text(entry.reflection.isEmpty ? "No reflection written" : entry.reflection)
-                        .font(.system(size: 14)).lineLimit(2)
+                        .font(.system(size: 14))
+                        .foregroundStyle(AppTheme.Colors.secondaryText)
+                        .lineLimit(3)
+
+                    if !entry.tags.isEmpty {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack { ForEach(entry.tags, id: \.self) { PATagChip(text: $0) } }
+                        }
+                    }
                 }
-                Spacer()
+            }
+
+            if let thumbnail {
+                Image(uiImage: thumbnail)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(height: 140)
+                    .frame(maxWidth: .infinity)
+                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
+                    .clipped()
             }
         }
     }

@@ -37,6 +37,23 @@ final class NotificationService {
         center.removePendingNotificationRequests(withIdentifiers: [id.uuidString])
     }
 
+    /// Schedules a fixed-time reminder that repeats every day — used for
+    /// the "don't forget to write your journal" habit nudge at 23:00.
+    func scheduleDailyReminder(id: UUID, title: String, body: String, hour: Int, minute: Int) {
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = .default
+
+        var components = DateComponents()
+        components.hour = hour
+        components.minute = minute
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+        let request = UNNotificationRequest(identifier: id.uuidString, content: content, trigger: trigger)
+        center.add(request)
+    }
+
     /// Fires "time to replace this" for linens (towels/bedsheets) once they
     /// cross their replacement interval.
     func scheduleReplacementReminder(id: UUID, itemName: String, dueDate: Date) {
