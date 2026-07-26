@@ -37,9 +37,12 @@ struct ClothingGridCell: View {
                 .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
                 .clipped()
 
-                Button(action: onToggleSelect) {
+                Button {
+                    withAnimation(AppTheme.Motion.bouncy) { onToggleSelect() }
+                } label: {
                     Image(systemName: isSelected ? "checkmark.circle.fill" : "plus.circle.fill")
                         .font(.system(size: 20))
+                        .symbolEffect(.bounce, value: isSelected)
                         .foregroundStyle(isSelected ? AppTheme.Colors.accent : .white, isSelected ? .clear : .black.opacity(0.35))
                         .background(Circle().fill(isSelected ? Color.white : .clear))
                         .padding(6)

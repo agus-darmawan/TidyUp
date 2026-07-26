@@ -32,9 +32,12 @@ struct ClothingRowView: View {
 
             Spacer()
 
-            Button(action: onToggleSelect) {
+            Button {
+                withAnimation(AppTheme.Motion.bouncy) { onToggleSelect() }
+            } label: {
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "plus.circle")
                     .font(.system(size: 22))
+                    .symbolEffect(.bounce, value: isSelected)
                     .foregroundStyle(isSelected ? AppTheme.Colors.accent : AppTheme.Colors.brandGray)
             }
             .buttonStyle(.plain)

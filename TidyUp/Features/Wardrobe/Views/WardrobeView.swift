@@ -95,7 +95,7 @@ struct WardrobeView: View {
                                             onToggleSelect: { cart.toggle(item) }
                                         )
                                     }
-                                    .buttonStyle(.plain)
+                                    .buttonStyle(PressableButtonStyle())
                                 }
                             }
                         case .list:
@@ -113,7 +113,7 @@ struct WardrobeView: View {
                                             onDelete: { viewModel.delete(item) }
                                         )
                                     }
-                                    .buttonStyle(.plain)
+                                    .buttonStyle(PressableButtonStyle())
                                 }
                             }
                         }
@@ -128,6 +128,7 @@ struct WardrobeView: View {
         .overlay(alignment: .bottom) {
             if !cart.isEmpty {
                 confirmBar(viewModel)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
     }
