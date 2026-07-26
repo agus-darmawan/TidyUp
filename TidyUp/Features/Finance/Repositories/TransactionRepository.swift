@@ -19,6 +19,7 @@ protocol TransactionRepositoryProtocol {
     func save(_ transaction: Transaction, previousAmount: Decimal?, previousType: TransactionType?)
     func delete(_ transaction: Transaction)
     func markReimbursementPaid(_ transaction: Transaction, creditTo account: Account)
+    func markReimbursementSubmitted(_ transaction: Transaction)
     func markReimbursementRejected(_ transaction: Transaction)
     func seedDefaultCategoriesIfNeeded()
     var pendingReimburseTotal: Decimal { get }
@@ -100,6 +101,13 @@ final class TransactionRepository: TransactionRepositoryProtocol {
     func markReimbursementPaid(_ transaction: Transaction, creditTo account: Account) {
         transaction.reimburseStatus = .paid
         account.balance += transaction.amount
+        try? context.save()
+    }
+
+    /// Pending → Submitted: you've sent the receipt/claim to the office,
+    /// now waiting on Paid or Rejected.
+    func markReimbursementSubmitted(_ transaction: Transaction) {
+        transaction.reimburseStatus = .submitted
         try? context.save()
     }
 

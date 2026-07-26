@@ -48,6 +48,12 @@ final class ReimbursementViewModel {
         load()
     }
 
+    /// Pending → Submitted (claim sent to the office, awaiting outcome).
+    func markSubmitted(_ transaction: Transaction) {
+        transactionRepository.markReimbursementSubmitted(transaction)
+        load()
+    }
+
     /// Rejected by the office — it's excluded from the pending total and
     /// the PDF report from now on, and effectively becomes a personal
     /// expense (the balance already reflects this; nothing else changes).

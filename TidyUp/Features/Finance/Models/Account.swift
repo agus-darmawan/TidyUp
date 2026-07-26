@@ -31,6 +31,13 @@ enum AccountType: String, Codable, CaseIterable, Identifiable {
     }
 
     var isCredit: Bool { self == .creditCard || self == .payLater }
+
+    /// E-wallets (and credit/pay-later, which are already debt-style) can
+    /// go negative — think GoPay PayLater. Bank and cash can't realistically
+    /// go below zero, so those get a confirmation warning instead.
+    var allowsNegativeBalance: Bool {
+        self == .eWallet || isCredit
+    }
 }
 
 @Model

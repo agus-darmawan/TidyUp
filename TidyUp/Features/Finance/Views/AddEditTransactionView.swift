@@ -35,6 +35,7 @@ struct AddEditTransactionView: View {
     @State private var isRecurring: Bool
     @State private var recurrence: RecurrenceFrequency
     @State private var showingMissingPhotoAlert = false
+    @State private var showingNegativeBalanceWarning = false
 
     /// Reimbursement is a Type choice, not a separate flag.
     private var isReimbursement: Bool { type == .reimbursement }
@@ -139,6 +140,12 @@ struct AddEditTransactionView: View {
             } message: {
                 Text("Reimbursement requires both a receipt photo and an item photo before saving.")
             }
+            .alert("Balance Will Go Negative", isPresented: $showingNegativeBalanceWarning) {
+                Button("Save Anyway", role: .destructive) { commitSave() }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("\(fromAccount?.name ?? "This account") isn't a pay-later or e-wallet account — its balance will go below zero. Continue?")
+            }
         }
     }
 
@@ -177,6 +184,24 @@ struct AddEditTransactionView: View {
                 return
             }
         }
+
+        // Money leaving fromAccount (expense/reimbursement/transfer) — warn
+        // if this would push a non-negative-allowed account below zero.
+        let isOutgoing = type == .expense || type == .reimbursement || type == .transfer || type == .debtLent
+        if isOutgoing, !fromAccount.type.allowsNegativeBalance {
+            let previousAmount = existingTransaction?.type == type ? (existingTransaction?.amount ?? 0) : 0
+            let projectedBalance = fromAccount.balance + previousAmount - amount
+            if projectedBalance < 0 {
+                showingNegativeBalanceWarning = true
+                return
+            }
+        }
+
+        commitSave()
+    }
+
+    private func commitSave() {
+        guard let amount = Decimal(string: amountText), let fromAccount else { return }
 
         let transaction = existingTransaction ?? Transaction(amount: amount, type: type)
         let previousAmount = existingTransaction?.amount
