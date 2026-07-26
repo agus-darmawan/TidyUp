@@ -17,11 +17,13 @@ struct PACard<Content: View>: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppTheme.Colors.surface)
         .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.lg, style: .continuous))
+        .shadow(color: Color.black.opacity(0.04), radius: 10, x: 0, y: 4)
     }
 }
 
-/// Solid-background badge with auto-contrasting text — used for tags,
-/// priority labels, and status pills so they never wash out.
+/// Soft-tinted, bordered chip — used for tags, categories, and status
+/// labels. Deliberately subtle (not a loud solid-fill pill) for a more
+/// refined, modern look.
 struct PATagChip: View {
     let text: String
     var color: Color = AppTheme.Colors.accent
@@ -29,10 +31,13 @@ struct PATagChip: View {
     var body: some View {
         Text(text)
             .font(.system(size: 11, weight: .semibold))
-            .padding(.horizontal, AppTheme.Spacing.sm)
-            .padding(.vertical, 4)
-            .background(color)
-            .foregroundStyle(AppTheme.Colors.contrastingText(on: color))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(color.opacity(0.12))
+            .foregroundStyle(color)
+            .overlay(
+                Capsule().stroke(color.opacity(0.25), lineWidth: 1)
+            )
             .clipShape(Capsule())
     }
 }
