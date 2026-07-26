@@ -83,7 +83,6 @@ struct DashboardView: View {
 
                 overviewSection(viewModel)
                 tasksSection(viewModel)
-                journalSection(viewModel)
             }
             .padding(.bottom, AppTheme.Spacing.xxl)
         }
@@ -208,38 +207,6 @@ struct DashboardView: View {
                     }
                 }
                 .padding(.horizontal)
-            }
-        }
-    }
-
-    private func journalSection(_ viewModel: DashboardViewModel) -> some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-            HStack {
-                sectionLabel("Recent Journal")
-                Spacer()
-                if !viewModel.recentJournalEntries.isEmpty {
-                    Button("See All") { tabRouter.go(to: .more) }
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(AppTheme.Colors.accent)
-                }
-            }
-            .padding(.horizontal)
-
-            if viewModel.recentJournalEntries.isEmpty {
-                Text("No journal entries yet")
-                    .font(AppTheme.Typography.footnote)
-                    .foregroundStyle(AppTheme.Colors.secondaryText)
-                    .padding(.horizontal)
-            } else {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: AppTheme.Spacing.md) {
-                        ForEach(viewModel.recentJournalEntries) { entry in
-                            JournalCardView(entry: entry)
-                                .frame(width: 260)
-                        }
-                    }
-                    .padding(.horizontal)
-                }
             }
         }
     }
