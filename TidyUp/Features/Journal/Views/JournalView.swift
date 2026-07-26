@@ -41,6 +41,7 @@ struct JournalView: View {
             }
         }
         .navigationTitle("Journal")
+        .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button { showingAdd = true } label: { Image(systemName: "plus.circle.fill") }

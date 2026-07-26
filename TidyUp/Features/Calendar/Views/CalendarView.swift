@@ -26,6 +26,7 @@ struct CalendarView: View {
             }
         }
         .navigationTitle("Calendar")
+        .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button { showingAddEvent = true } label: { Image(systemName: "plus.circle.fill") }
