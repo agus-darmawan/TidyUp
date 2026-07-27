@@ -47,4 +47,6 @@ touching real data — see `DependencyContainer.preview` and
 - **Reimbursement**: marking an expense as Reimbursement type debits the
   account immediately; a separate pending total tracks what the office
   still owes back. Flow: Pending → Submitted → Paid or Rejected.
-- **Still not built**: local backup/restore (JSON export/import).
+- **Backup/Restore**: exports everything — Tasks, Wardrobe, Journal, Money,
+  Calendar, plus every referenced photo — into one self-contained JSON
+  file (Settings → Backup & Restore). Restoring replaces all current data.
