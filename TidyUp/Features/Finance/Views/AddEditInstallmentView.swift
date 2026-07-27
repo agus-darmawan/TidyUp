@@ -26,11 +26,13 @@ struct AddEditInstallmentView: View {
                     DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
                 }
 
-                Section("Account") {
+                Section {
                     Picker("Account", selection: $selectedAccount) {
                         Text("None").tag(Account?.none)
                         ForEach(accounts) { Text($0.name).tag(Account?.some($0)) }
                     }
+                } header: {
+                    Text("Account")
                 } footer: {
                     Text("Recording a payment will reduce this account's outstanding balance.")
                 }
