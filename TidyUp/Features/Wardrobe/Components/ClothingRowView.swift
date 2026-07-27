@@ -48,6 +48,7 @@ struct ClothingRowView: View {
             RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
                 .stroke(isSelected ? AppTheme.Colors.accent : .clear, lineWidth: 1.5)
         )
+        .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 2)
         .swipeActions(edge: .trailing) {
             Button(role: .destructive, action: onDelete) {
                 Label("Delete", systemImage: "trash")

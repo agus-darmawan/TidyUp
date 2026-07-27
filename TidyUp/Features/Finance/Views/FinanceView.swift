@@ -90,6 +90,7 @@ struct FinanceView: View {
                                     .padding(.vertical, AppTheme.Spacing.xs)
                                     .background(AppTheme.Colors.surface)
                                     .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
+                                    .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 2)
                                     .padding(.horizontal)
                                     .contextMenu {
                                         Button(role: .destructive) { viewModel.deleteTransaction(transaction) } label: {

@@ -64,6 +64,7 @@ struct ClothingGridCell: View {
             RoundedRectangle(cornerRadius: AppTheme.Radius.lg, style: .continuous)
                 .stroke(isSelected ? AppTheme.Colors.accent : .clear, lineWidth: 1.5)
         )
+        .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 3)
     }
 
     private var statusColor: Color {
