@@ -47,4 +47,4 @@ touching real data — see `DependencyContainer.preview` and
 - **Reimbursement**: marking an expense as Reimbursement type debits the
   account immediately; a separate pending total tracks what the office
   still owes back. Flow: Pending → Submitted → Paid or Rejected.
-- **Still not built**: Debt/Installment screens (models exist), backup/restore.
+- **Still not built**: local backup/restore (JSON export/import).
