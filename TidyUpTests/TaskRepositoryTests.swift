@@ -5,17 +5,23 @@
 //  Integration-style test against a real in-memory SwiftData container —
 //  this is exactly the pattern DependencyContainer.preview exists for.
 //
+//  NOTE: @MainActor is applied per-method, not at the class level.
+//  Marking the whole XCTestCase class @MainActor was found to crash the
+//  Xcode 27 beta test runner ("Lost connection to testmanagerd") — the
+//  per-method annotation avoids that while still satisfying the
+//  repositories' MainActor isolation requirement.
+//
 
 import XCTest
 import SwiftData
 @testable import TidyUp
 
-@MainActor
 final class TaskRepositoryTests: XCTestCase {
 
     private var context: ModelContext!
     private var repository: TaskRepository!
 
+    @MainActor
     override func setUpWithError() throws {
         let schema = Schema([TaskItem.self, SubTask.self])
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
@@ -29,6 +35,7 @@ final class TaskRepositoryTests: XCTestCase {
         repository = nil
     }
 
+    @MainActor
     func testSaveInsertsNewTask() throws {
         let task = TaskItem(title: "Buy groceries")
         repository.save(task)
@@ -37,6 +44,7 @@ final class TaskRepositoryTests: XCTestCase {
         XCTAssertEqual(all.first?.title, "Buy groceries")
     }
 
+    @MainActor
     func testToggleDoneMarksTaskComplete() throws {
         let task = TaskItem(title: "Finish report")
         repository.save(task)
@@ -44,6 +52,7 @@ final class TaskRepositoryTests: XCTestCase {
         XCTAssertTrue(task.isDone)
     }
 
+    @MainActor
     func testCompletingRecurringTaskSpawnsNextOccurrence() throws {
         let today = Date.now.startOfDay
         let task = TaskItem(title: "Water the plants", dueDate: today, recurrence: .daily)
@@ -58,6 +67,7 @@ final class TaskRepositoryTests: XCTestCase {
         XCTAssertFalse(next?.isDone ?? true)
     }
 
+    @MainActor
     func testDeleteRemovesTask() throws {
         let task = TaskItem(title: "Temporary")
         repository.save(task)
