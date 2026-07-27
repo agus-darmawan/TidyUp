@@ -38,6 +38,17 @@ final class ImageStorageService {
         return UIImage(data: data)
     }
 
+    /// Raw bytes for a stored image — used when embedding photos into a backup export.
+    func loadRawData(filename: String) -> Data? {
+        try? Data(contentsOf: imagesDirectory.appendingPathComponent(filename))
+    }
+
+    /// Restores an image from a backup at its exact original filename, so
+    /// every model's stored `photoFilename` reference still resolves correctly.
+    func restoreRawData(_ data: Data, filename: String) {
+        try? data.write(to: imagesDirectory.appendingPathComponent(filename), options: .atomic)
+    }
+
     func deleteImage(filename: String) {
         try? fileManager.removeItem(at: imagesDirectory.appendingPathComponent(filename))
     }

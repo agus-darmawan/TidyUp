@@ -51,6 +51,9 @@ struct SettingsView: View {
                 NavigationLink { WardrobeCategoriesView() } label: {
                     SettingsIconRow(icon: "tshirt.fill", tint: AppTheme.Colors.warning, title: "Wardrobe Categories")
                 }
+                NavigationLink { BackupRestoreView() } label: {
+                    SettingsIconRow(icon: "arrow.triangle.2.circlepath", tint: AppTheme.Colors.reimburse, title: "Backup & Restore")
+                }
             }
 
             Section("About") {

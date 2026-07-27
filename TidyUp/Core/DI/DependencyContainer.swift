@@ -27,6 +27,7 @@ final class DependencyContainer {
     let imageStorageService: ImageStorageService
     let notificationService: NotificationService
     let pdfExportService: PDFExportService
+    let backupService: BackupService
 
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
@@ -44,6 +45,7 @@ final class DependencyContainer {
         self.installmentRepository = InstallmentRepository(context: modelContext)
 
         self.pdfExportService = PDFExportService(imageStorageService: imageStorageService)
+        self.backupService = BackupService(context: modelContext, imageStorageService: imageStorageService)
     }
 
     /// Fixed, stable ID for the daily journal reminder — scheduling with
