@@ -104,9 +104,9 @@ struct DashboardView: View {
             Spacer()
             Button {} label: {
                 Image(systemName: "bell.fill")
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(.white)
-                    .frame(width: 40, height: 40)
+                    .frame(width: 44, height: 44)
                     .background(.white.opacity(0.18))
                     .clipShape(Circle())
             }

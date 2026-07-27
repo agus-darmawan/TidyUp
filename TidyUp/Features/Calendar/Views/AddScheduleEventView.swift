@@ -44,6 +44,8 @@ struct AddScheduleEventView: View {
                                 .overlay(
                                     Circle().stroke(Color.primary, lineWidth: selectedColor == hex ? 2 : 0)
                                 )
+                                .frame(width: 44, height: 44)
+                                .contentShape(Rectangle())
                                 .onTapGesture { selectedColor = hex }
                         }
                     }

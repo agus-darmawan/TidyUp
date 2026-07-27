@@ -34,6 +34,7 @@ struct CalendarMonthGridCell: View {
             }
         }
         .frame(maxWidth: .infinity)
+        .padding(.vertical, 3)
         .contentShape(Rectangle())
         .onTapGesture { if date != nil { onTap() } }
     }

@@ -98,9 +98,9 @@ struct WardrobeView: View {
                     withAnimation(AppTheme.Motion.snappy) { layout = layout == .grid ? .list : .grid }
                 } label: {
                     Image(systemName: layout == .grid ? "list.bullet" : "square.grid.2x2")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(AppTheme.Colors.primaryText)
-                        .frame(width: 32, height: 32)
+                        .frame(width: 44, height: 44)
                         .background(AppTheme.Colors.surface)
                         .clipShape(Circle())
                 }
