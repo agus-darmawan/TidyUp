@@ -1,6 +1,6 @@
 # TidyUp
 
-[![iOS Build & Test](https://github.com/agus-darmawan/TidyUp/actions/workflows/ios-tests.yml/badge.svg)](https://github.com/agus-darmawan/TidyUp/actions/workflows/ios-tests.yml)
+[![iOS Build](https://github.com/agus-darmawan/TidyUp/actions/workflows/ios-tests.yml/badge.svg)](https://github.com/agus-darmawan/TidyUp/actions/workflows/ios-tests.yml)
 
 Offline personal assistant app — Tasks, Money (with Reimbursement),
 Wardrobe, Journal, Calendar. No backend, no login. Swift 6, SwiftUI,
@@ -14,15 +14,8 @@ SwiftData, MVVM.
    - `Privacy - Camera Usage Description`
 3. Build & run.
 
-## Running Tests
-
-This repo ships test files under `TidyUpTests/` but Xcode project files
-can't be safely auto-generated, so add the test target once:
-
-1. Xcode → File → New → Target → **Unit Testing Bundle** → name it `TidyUpTests`.
-2. Drag the files from `TidyUpTests/` into that target.
-3. `Cmd+U` to run locally, or push — GitHub Actions runs the same suite
-   automatically (see `.github/workflows/ios-tests.yml`).
+GitHub Actions builds the project on every push/PR (see
+`.github/workflows/ios-tests.yml`) — no unit test target for now.
 
 ## Structure
 
@@ -35,9 +28,8 @@ TidyUp/
                       Models / Repositories / ViewModels / Views / Components
 ```
 
-Repositories are protocol-based specifically so they're testable without
-touching real data — see `DependencyContainer.preview` and
-`TidyUpTests/TaskRepositoryTests.swift` for the in-memory pattern.
+Repositories are protocol-based, so they're easy to swap for an
+in-memory container in previews — see `DependencyContainer.preview`.
 
 ## Notes
 

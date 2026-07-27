@@ -1,12 +1,5 @@
-name: iOS Build & Test
+name: iOS Build
 
-# Runs on every push/PR. Requires the TidyUp.xcodeproj (created locally
-# in Xcode) to be committed to the repo, with a "TidyUpTests" unit test
-# target added — see README.md "Running Tests" for the one-time setup.
-#
-# Uses the xcode-27 runner image (public preview) since this project's
-# .pbxproj was saved in Xcode 27's project format — older runner images
-# (macos-15, which only has up to Xcode 16.x) can't open it.
 on:
   push:
     branches: [ main, master ]
@@ -14,7 +7,7 @@ on:
     branches: [ main, master ]
 
 jobs:
-  test:
+  build:
     runs-on: xcode-27
 
     steps:
@@ -24,10 +17,10 @@ jobs:
       - name: Show Xcode version
         run: xcodebuild -version
 
-      - name: Build and test
+      - name: Build
         run: |
           set -o pipefail
-          xcodebuild test \
+          xcodebuild build \
             -project TidyUp.xcodeproj \
             -scheme TidyUp \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest'
+            -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest'

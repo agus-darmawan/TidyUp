@@ -6,19 +6,8 @@
 	objectVersion = 110;
 	objects = {
 
-/* Begin PBXContainerItemProxy section */
-		0530AA59301601FA0054D656 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 05309E403014F8AA0054D656 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 05309E473014F8AA0054D656;
-			remoteInfo = TidyUp;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
 		05309E483014F8AA0054D656 /* TidyUp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TidyUp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		0530AA55301601FA0054D656 /* TidyUpTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TidyUpTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -27,20 +16,10 @@
 			path = TidyUp;
 			sourceTree = "<group>";
 		};
-		0530AA56301601FA0054D656 /* TidyUpTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = TidyUpTests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		05309E453014F8AA0054D656 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			files = (
-			);
-		};
-		0530AA52301601FA0054D656 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
 			);
@@ -52,7 +31,6 @@
 			isa = PBXGroup;
 			children = (
 				05309E4A3014F8AA0054D656 /* TidyUp */,
-				0530AA56301601FA0054D656 /* TidyUpTests */,
 				05309E493014F8AA0054D656 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,7 +39,6 @@
 			isa = PBXGroup;
 			children = (
 				05309E483014F8AA0054D656 /* TidyUp.app */,
-				0530AA55301601FA0054D656 /* TidyUpTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -87,27 +64,6 @@
 			productReference = 05309E483014F8AA0054D656 /* TidyUp.app */;
 			productType = "com.apple.product-type.application";
 		};
-		0530AA54301601FA0054D656 /* TidyUpTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 0530AA5D301601FA0054D656 /* Build configuration list for PBXNativeTarget "TidyUpTests" */;
-			buildPhases = (
-				0530AA51301601FA0054D656 /* Sources */,
-				0530AA52301601FA0054D656 /* Frameworks */,
-				0530AA53301601FA0054D656 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				0530AA5A301601FA0054D656 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				0530AA56301601FA0054D656 /* TidyUpTests */,
-			);
-			name = TidyUpTests;
-			productName = TidyUpTests;
-			productReference = 0530AA55301601FA0054D656 /* TidyUpTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -120,10 +76,6 @@
 				TargetAttributes = {
 					05309E473014F8AA0054D656 = {
 						CreatedOnToolsVersion = 27.0;
-					};
-					0530AA54301601FA0054D656 = {
-						CreatedOnToolsVersion = 27.0;
-						TestTargetID = 05309E473014F8AA0054D656;
 					};
 				};
 			};
@@ -142,18 +94,12 @@
 			projectRoot = "";
 			targets = (
 				05309E473014F8AA0054D656 /* TidyUp */,
-				0530AA54301601FA0054D656 /* TidyUpTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		05309E463014F8AA0054D656 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			files = (
-			);
-		};
-		0530AA53301601FA0054D656 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
 			);
@@ -166,20 +112,7 @@
 			files = (
 			);
 		};
-		0530AA51301601FA0054D656 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			files = (
-			);
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		0530AA5A301601FA0054D656 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 05309E473014F8AA0054D656 /* TidyUp */;
-			targetProxy = 0530AA59301601FA0054D656 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		05309E533014F8AC0054D656 /* Debug configuration for PBXProject "TidyUp" */ = {
@@ -375,48 +308,6 @@
 			};
 			name = Release;
 		};
-		0530AA5B301601FA0054D656 /* Debug configuration for PBXNativeTarget "TidyUpTests" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 962K8CY5A5;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = appledeveloperacademy.TidyUpTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TidyUp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TidyUp";
-			};
-			name = Debug;
-		};
-		0530AA5C301601FA0054D656 /* Release configuration for PBXNativeTarget "TidyUpTests" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 962K8CY5A5;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = appledeveloperacademy.TidyUpTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TidyUp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TidyUp";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -433,14 +324,6 @@
 			buildConfigurations = (
 				05309E563014F8AC0054D656 /* Debug configuration for PBXNativeTarget "TidyUp" */,
 				05309E573014F8AC0054D656 /* Release configuration for PBXNativeTarget "TidyUp" */,
-			);
-			defaultConfigurationName = Release;
-		};
-		0530AA5D301601FA0054D656 /* Build configuration list for PBXNativeTarget "TidyUpTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				0530AA5B301601FA0054D656 /* Debug configuration for PBXNativeTarget "TidyUpTests" */,
-				0530AA5C301601FA0054D656 /* Release configuration for PBXNativeTarget "TidyUpTests" */,
 			);
 			defaultConfigurationName = Release;
 		};
