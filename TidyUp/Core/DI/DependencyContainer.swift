@@ -21,6 +21,8 @@ final class DependencyContainer {
     let transactionRepository: TransactionRepository
     let journalRepository: JournalRepository
     let scheduleEventRepository: ScheduleEventRepository
+    let debtRepository: DebtRepository
+    let installmentRepository: InstallmentRepository
 
     let imageStorageService: ImageStorageService
     let notificationService: NotificationService
@@ -38,6 +40,8 @@ final class DependencyContainer {
         self.transactionRepository = TransactionRepository(context: modelContext, accountRepository: accountRepository)
         self.journalRepository = JournalRepository(context: modelContext)
         self.scheduleEventRepository = ScheduleEventRepository(context: modelContext)
+        self.debtRepository = DebtRepository(context: modelContext)
+        self.installmentRepository = InstallmentRepository(context: modelContext)
 
         self.pdfExportService = PDFExportService(imageStorageService: imageStorageService)
     }

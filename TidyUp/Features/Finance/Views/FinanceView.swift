@@ -33,6 +33,8 @@ struct FinanceView: View {
                         Button { showingAddTransaction = true } label: { Label("New Transaction", systemImage: "plus") }
                         Button { showingAddAccount = true } label: { Label("New Account", systemImage: "creditcard.and.123") }
                         NavigationLink { ReimbursementView() } label: { Label("Reimbursements", systemImage: "arrow.triangle.2.circlepath") }
+                        NavigationLink { DebtListView() } label: { Label("Debts & Loans", systemImage: "person.2.fill") }
+                        NavigationLink { InstallmentListView() } label: { Label("Installments", systemImage: "calendar.badge.clock") }
                         Button { showingExport = true } label: { Label("Export Report", systemImage: "square.and.arrow.up") }
                     } label: {
                         Image(systemName: "plus.circle.fill")
